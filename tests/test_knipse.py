@@ -7,7 +7,6 @@
 import unittest
 from click.testing import CliRunner
 
-from knipse import knipse
 from knipse import cli
 
 
