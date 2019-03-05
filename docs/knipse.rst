@@ -12,6 +12,14 @@ knipse.cli module
     :undoc-members:
     :show-inheritance:
 
+knipse.dhash module
+-------------------
+
+.. automodule:: knipse.dhash
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------

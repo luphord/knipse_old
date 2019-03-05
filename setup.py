@@ -13,9 +13,9 @@ with open('HISTORY.rst') as history_file:
 
 requirements = ['Click>=6.0', 'Pillow>=5.0']
 
-setup_requirements = [ ]
+setup_requirements = []
 
-test_requirements = [ ]
+test_requirements = []
 
 setup(
     author="luphord",
@@ -33,7 +33,7 @@ setup(
     description="A photo manager focussing on list management.",
     entry_points={
         'console_scripts': [
-            'knipse=knipse.cli:main',
+            'knipse=knipse.cli:cli_knipse',
         ],
     },
     install_requires=requirements,

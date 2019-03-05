@@ -25,9 +25,9 @@ class TestKnipse(unittest.TestCase):
     def test_command_line_interface(self):
         """Test the CLI."""
         runner = CliRunner()
-        result = runner.invoke(cli.main)
+        result = runner.invoke(cli.cli_knipse)
         assert result.exit_code == 0
-        assert 'knipse.cli.main' in result.output
-        help_result = runner.invoke(cli.main, ['--help'])
+        assert 'photo' in result.output
+        help_result = runner.invoke(cli.cli_knipse, ['--help'])
         assert help_result.exit_code == 0
         assert '--help  Show this message and exit.' in help_result.output

@@ -3,16 +3,17 @@
 """Console script for knipse."""
 import sys
 import click
+from .dhash import cli_dhash
 
 
-@click.command()
-def main(args=None):
-    """Console script for knipse."""
-    click.echo("Replace this message by putting your code into "
-               "knipse.cli.main")
-    click.echo("See click documentation at http://click.pocoo.org/")
+@click.group(name='knipse')
+def cli_knipse():
+    '''Manage your photo collections and lists.'''
     return 0
 
 
+cli_knipse.add_command(cli_dhash)
+
+
 if __name__ == "__main__":
-    sys.exit(main())  # pragma: no cover
+    sys.exit(cli_knipse())
