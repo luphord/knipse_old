@@ -20,6 +20,14 @@ knipse.dhash module
     :undoc-members:
     :show-inheritance:
 
+knipse.walk module
+------------------
+
+.. automodule:: knipse.walk
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------
