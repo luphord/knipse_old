@@ -22,6 +22,8 @@ def walk_images(base_folder):
                 raise Exception('Unexpected folder entry {}'.format(entry))
         n_sub_folders = len(sub_folders)
         files_increase = (higher - lower) / (n_sub_folders + 1)
+        if not files:
+            files_increase = 0
         local_higher = lower + files_increase
         local_progress = 0.0
         for file_path in files:
@@ -37,8 +39,8 @@ def walk_images(base_folder):
         if sub_folders:
             folder_increase = (higher - lower - files_increase) / n_sub_folders
             sub_folders = [(folder,
-                            lower + (i+1) * folder_increase,
-                            lower + (i+2) * folder_increase)
+                            lower + files_increase + i * folder_increase,
+                            lower + files_increase + (i+1) * folder_increase)
                            for i, folder in enumerate(sub_folders)]
             sub_folders.reverse()  # by popping the list we walk backwards
             folder_tree.append(sub_folders)
