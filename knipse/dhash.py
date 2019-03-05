@@ -33,8 +33,9 @@ def dhash_bytes(img: Image) -> bytes:
 @click.command(name='dhash')
 @click.argument('file',
                 type=click.Path(exists=True, file_okay=True, dir_okay=False,
-                                resolve_path=True))
+                                resolve_path=True), nargs=-1)
 def cli_dhash(file):
     '''Compute the perceptual difference hash of the given file'''
-    img = Image.open(file)
-    click.echo('{}\t{}'.format(file, dhash_bytes(img).hex()))
+    for f in file:
+        img = Image.open(f)
+        click.echo('{}\t{}'.format(f, dhash_bytes(img).hex()))
