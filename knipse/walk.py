@@ -49,7 +49,7 @@ def walk_images(base_folder):
 @click.command(name='walk')
 @click.argument('base_folder',
                 type=click.Path(exists=True, file_okay=False, dir_okay=True,
-                                resolve_path=True))
+                                resolve_path=True), default='.')
 def cli_walk(base_folder):
     '''Recursively list all images below `base_folder`'''
     for file_path, img, progress in walk_images(base_folder):
