@@ -4,6 +4,8 @@ from pathlib import Path
 import click
 from PIL import Image
 
+from .image import descriptor_from_image
+
 
 def walk_images(base_folder):
     '''Walk all folders below `base_folder` and yield contained images'''
@@ -53,4 +55,5 @@ def walk_images(base_folder):
 def cli_walk(base_folder):
     '''Recursively list all images below `base_folder`'''
     for file_path, img, progress in walk_images(base_folder):
-        click.echo('{:.1f}%\t{}'.format(progress * 100, file_path))
+        descr = descriptor_from_image(base_folder, file_path, img)
+        click.echo('{:.1f}%\t{}'.format(progress * 100, descr))
