@@ -21,3 +21,14 @@ class TestDifferenceHash(unittest.TestCase):
 
     def test_dhash_regression(self):
         self.assertEqual(_expected_hash, dhash_bytes(self.photo))
+
+    def test_dhash_after_resize(self):
+        dhsh = dhash_bytes(self.photo)
+        photo = self.photo.resize((200, 100), Image.BILINEAR)
+        self.assertEqual(dhsh, dhash_bytes(photo))
+        photo = self.photo.resize((80, 100), Image.BILINEAR)
+        self.assertEqual(dhsh, dhash_bytes(photo))
+        photo = self.photo.resize((3000, 2000), Image.BILINEAR)
+        self.assertEqual(dhsh, dhash_bytes(photo))
+        photo = self.photo.resize((90, 90), Image.BILINEAR)
+        self.assertEqual(dhsh, dhash_bytes(photo))
