@@ -27,5 +27,6 @@ class TestImageDescriptor(unittest.TestCase):
                                        Image.open(self.path))
         self.assertEqual(expected.path, actual.path)
         self.assertEqual(expected.created_at, actual.created_at)
-        self.assertEqual(expected.modified_at, actual.modified_at)
+        # do not compare modification times of images in version control
+        # as these depend on the time of checkout
         self.assertEqual(expected.dhash, actual.dhash)
