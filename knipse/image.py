@@ -15,7 +15,8 @@ class _EXIF:
 
 
 def _get_modification_time(path: Path):
-    return datetime.fromtimestamp(os.path.getmtime(path))
+    # getmtime does not support Path in Python 3.5 -> need to convert to str
+    return datetime.fromtimestamp(os.path.getmtime(str(path)))
 
 
 def _get_creation_time(path: Path, img: Image) -> datetime:
