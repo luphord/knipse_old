@@ -1,20 +1,22 @@
 # -*- coding: utf-8 -*-
 
 from pathlib import Path
+from typing import List  # noqa: 401
+
 import click
 from PIL import Image
 
 from .image import descriptor_from_image
 
 
-def walk_images(base_folder):
+def walk_images(base_folder: Path):
     '''Walk all folders below `base_folder` and yield contained images'''
     folder_tree = [[(Path(base_folder).resolve(), 0.0, 1.0)]]
     while folder_tree:
         level = folder_tree.pop()
         folder, lower, higher = level.pop()
         files = []
-        sub_folders = []
+        sub_folders = []  # type: List[Path]
         for entry in folder.iterdir():
             if entry.is_file():
                 files.append(entry)
@@ -40,12 +42,12 @@ def walk_images(base_folder):
             folder_tree.append(level)
         if sub_folders:
             folder_increase = (higher - lower - files_increase) / n_sub_folders
-            sub_folders = [(folder,
-                            lower + files_increase + i * folder_increase,
-                            lower + files_increase + (i+1) * folder_increase)
-                           for i, folder in enumerate(sub_folders)]
-            sub_folders.reverse()  # by popping the list we walk backwards
-            folder_tree.append(sub_folders)
+            folder_progr = [(folder,
+                             lower + files_increase + i * folder_increase,
+                             lower + files_increase + (i+1) * folder_increase)
+                            for i, folder in enumerate(sub_folders)]
+            folder_progr.reverse()  # by popping the list we walk backwards
+            folder_tree.append(folder_progr)
 
 
 @click.command(name='walk')
