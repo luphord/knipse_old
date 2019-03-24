@@ -9,12 +9,12 @@ class ImageDescriptor:
 
     def __init__(self,
                  path: Path,
-                 creation_date: datetime,
+                 created_at: datetime,
                  dhash: bytes) -> None:
         self.path = Path(path)
-        self.creation_date = creation_date
+        self.created_at = created_at
         self.dhash = dhash
 
     def __repr__(self) -> str:
         return '''ImageDescriptor('{}', {!r}, {})'''.format(
-            self.path, self.creation_date, self.dhash)
+            self.path, self.created_at, self.dhash)
