@@ -20,6 +20,14 @@ class ImageDescriptor:
         self.md5 = md5
         self.dhash = dhash
 
+    def _fields_iter(self):
+        yield 'path', self.path
+        yield 'created_at', self.created_at
+        yield 'modified_at', self.modified_at
+        yield 'md5', self.md5
+        yield 'dhash', self.dhash
+
     def __repr__(self) -> str:
-        return '''ImageDescriptor({!r}, {!r}, {!r}, {!r}, {!r})'''.format(
-            self.path, self.created_at, self.modified_at, self.md5, self.dhash)
+        fields = ', '.join('{}={!r}'.format(key, value)
+                           for key, value in self._fields_iter())
+        return 'ImageDescriptor({})'.format(fields)
