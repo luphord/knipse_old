@@ -3,6 +3,7 @@
 import os
 from pathlib import Path
 from datetime import datetime
+import hashlib
 from typing import Optional
 
 from PIL import Image
@@ -29,6 +30,17 @@ def _get_creation_time(path: Path, img: Image) -> Optional[datetime]:
     return None
 
 
+def _md5sum(path: Path) -> bytes:
+    md5 = hashlib.md5()
+    with open(str(path), 'rb') as f:
+        while True:
+            data = f.read(1024)
+            if not data:
+                break
+            md5.update(data)
+    return md5.digest()
+
+
 def descriptor_from_image(source: Path,
                           path: Path,
                           img: Image) -> ImageDescriptor:
@@ -36,8 +48,10 @@ def descriptor_from_image(source: Path,
     path = Path(path).resolve()
     created_at = _get_creation_time(path, img)
     modified_at = _get_modification_time(path)
+    md5 = _md5sum(path)
     dhsh = dhash_bytes(img)
     return ImageDescriptor(path.relative_to(source),
                            created_at,
                            modified_at,
+                           md5,
                            dhsh)

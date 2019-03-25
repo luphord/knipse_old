@@ -12,12 +12,14 @@ class ImageDescriptor:
                  path: Path,
                  created_at: Optional[datetime],
                  modified_at: datetime,
+                 md5: bytes,
                  dhash: bytes) -> None:
         self.path = Path(path)
         self.created_at = created_at
         self.modified_at = modified_at
+        self.md5 = md5
         self.dhash = dhash
 
     def __repr__(self) -> str:
-        return '''ImageDescriptor({!r}, {!r}, {!r}, {!r})'''.format(
+        return '''ImageDescriptor({!r}, {!r}, {!r}, {!r}, {!r})'''.format(
             self.path, self.created_at, self.modified_at, self.dhash)
