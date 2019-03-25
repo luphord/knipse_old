@@ -2,6 +2,7 @@
 
 from pathlib import Path
 from datetime import datetime
+from typing import Optional
 
 
 class ImageDescriptor:
@@ -9,7 +10,7 @@ class ImageDescriptor:
 
     def __init__(self,
                  path: Path,
-                 created_at: datetime,
+                 created_at: Optional[datetime],
                  modified_at: datetime,
                  dhash: bytes) -> None:
         self.path = Path(path)
