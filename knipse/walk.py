@@ -33,8 +33,8 @@ def walk_images(base_folder: Path):
         for file_path in files:
             local_progress += 1 / len(files)
             try:
-                img = Image.open(file_path)
                 progress = lower + (local_higher - lower) * local_progress
+                img = Image.open(file_path)
                 yield file_path, img, progress
             except IOError:
                 pass  # not an image
