@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 from datetime import datetime
 import hashlib
-from typing import Optional
+from typing import Optional, Tuple
 
 from PIL import Image
 
@@ -41,16 +41,23 @@ def _md5sum(path: Path) -> bytes:
     return md5.digest()
 
 
+def path_and_modification(source: Path, path: Path) -> Tuple[Path, datetime]:
+    '''Returns relative path to `source` and modification time of `path`'''
+    source = Path(source).resolve()
+    path = Path(path).resolve()
+    modified_at = _get_modification_time(path)
+    return path.relative_to(source), modified_at
+
+
 def descriptor_from_image(source: Path,
                           path: Path,
                           img: Image) -> ImageDescriptor:
-    source = Path(source).resolve()
     path = Path(path).resolve()
+    rel_path, modified_at = path_and_modification(source, path)
     created_at = _get_creation_time(path, img)
-    modified_at = _get_modification_time(path)
     md5 = _md5sum(path)
     dhsh = dhash_bytes(img)
-    return ImageDescriptor(path.relative_to(source),
+    return ImageDescriptor(rel_path,
                            created_at,
                            modified_at,
                            md5,
