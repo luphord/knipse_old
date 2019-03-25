@@ -31,3 +31,9 @@ class ImageDescriptor:
         fields = ', '.join('{}={!r}'.format(key, value)
                            for key, value in self._fields_iter())
         return 'ImageDescriptor({})'.format(fields)
+
+    def __str__(self) -> str:
+        return '\t'.join('{}'.format(value.hex()
+                                     if isinstance(value, bytes)
+                                     else value)
+                         for _, value in self._fields_iter())
