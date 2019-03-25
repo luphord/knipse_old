@@ -22,4 +22,4 @@ class ImageDescriptor:
 
     def __repr__(self) -> str:
         return '''ImageDescriptor({!r}, {!r}, {!r}, {!r}, {!r})'''.format(
-            self.path, self.created_at, self.modified_at, self.dhash)
+            self.path, self.created_at, self.modified_at, self.md5, self.dhash)
