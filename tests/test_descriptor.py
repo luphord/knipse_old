@@ -7,7 +7,13 @@ from datetime import datetime
 from PIL import Image
 
 from knipse.descriptor import ImageDescriptor
-from knipse.image import descriptor_from_image
+from knipse.image import descriptor_from_image, path_and_modification
+from knipse.walk import walk_images
+
+
+def _does_not_contain_forest(source, path):
+    rel_path, modified_at = path_and_modification(source, path)
+    return 'forest' not in str(rel_path).lower()
 
 
 class TestImageDescriptor(unittest.TestCase):
@@ -47,3 +53,20 @@ class TestImageDescriptor(unittest.TestCase):
         self.assertEqual(expected.created_at, actual.created_at)
         self.assertEqual(expected.md5, actual.md5)
         self.assertEqual(expected.dhash, actual.dhash)
+
+    def test_filtered_walk(self):
+        '''Test walking a folder with a filter'''
+        for file_path, img, progress in walk_images(self.src,
+                                                    _does_not_contain_forest):
+            p = str(file_path.relative_to(self.src)).lower()
+            self.assertTrue('forest' not in p)
+
+    def test_unfiltered_walk(self):
+        '''Test walking a folder with a filter'''
+        found = False
+        for file_path, img, progress in walk_images(self.src):
+            p = str(file_path.relative_to(self.src)).lower()
+            if 'forest' not in p:
+                found = True
+                break
+        self.assertTrue(found)

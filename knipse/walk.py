@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from pathlib import Path
-from typing import List  # noqa: 401
+from typing import List, Callable, Optional, Iterable, Tuple  # noqa: 401
 
 import click
 from PIL import Image
@@ -9,7 +9,9 @@ from PIL import Image
 from .image import descriptor_from_image
 
 
-def walk_images(base_folder: Path):
+def walk_images(base_folder: Path,
+                filter: Optional[Callable[[Path, Path], bool]] = None) \
+        -> Iterable[Tuple[Path, Image.Image, float]]:
     '''Walk all folders below `base_folder` and yield contained images'''
     folder_tree = [[(Path(base_folder).resolve(), 0.0, 1.0)]]
     while folder_tree:
@@ -34,8 +36,9 @@ def walk_images(base_folder: Path):
             local_progress += 1 / len(files)
             try:
                 progress = lower + (local_higher - lower) * local_progress
-                img = Image.open(file_path)
-                yield file_path, img, progress
+                if not filter or filter(base_folder, file_path):
+                    img = Image.open(file_path)
+                    yield file_path, img, progress
             except IOError:
                 pass  # not an image
         if level:
