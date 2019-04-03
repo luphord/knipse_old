@@ -31,3 +31,16 @@ class TestImageWalking(unittest.TestCase):
             self.assertIn(p, self.expected_images)
             self.expected_images.remove(p)
         self.assertEqual(0, len(self.expected_images))
+
+    def test_walking_and_remembering(self):
+        '''Walk a folder structure, remember all images
+           and filter them on next walk'''
+        known_files = []
+        for file_path, img, progress in walk_images(self.src):
+            known_files.append(file_path.relative_to(self.src))
+
+        def _filter(source, path):
+            return path.relative_to(source) not in known_files
+
+        for file_path, img, progress in walk_images(self.src, _filter):
+            raise Exception('should not happen')
