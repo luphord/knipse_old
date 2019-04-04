@@ -9,6 +9,9 @@ from PIL import Image
 from .image import descriptor_from_image
 
 
+_files_to_folders_heuristic = 0.1
+
+
 def walk_images(base_folder: Path,
                 filter: Optional[Callable[[Path, Path], bool]] = None) \
         -> Iterable[Tuple[Path, Image.Image, float]]:
@@ -27,7 +30,9 @@ def walk_images(base_folder: Path,
             else:
                 raise Exception('Unexpected folder entry {}'.format(entry))
         n_sub_folders = len(sub_folders)
-        files_increase = (higher - lower) / (n_sub_folders + 1)
+        file_ratio = _files_to_folders_heuristic \
+            / (n_sub_folders + _files_to_folders_heuristic)
+        files_increase = (higher - lower) * file_ratio
         if not files:
             files_increase = 0
         local_higher = lower + files_increase
