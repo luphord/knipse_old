@@ -5,6 +5,7 @@ import sys
 import click
 from .dhash import cli_dhash
 from .walk import cli_walk
+from .symlink import cli_symlink
 
 
 @click.group(name='knipse')
@@ -15,6 +16,7 @@ def cli_knipse():
 
 cli_knipse.add_command(cli_dhash)
 cli_knipse.add_command(cli_walk)
+cli_knipse.add_command(cli_symlink)
 
 
 if __name__ == "__main__":
