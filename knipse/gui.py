@@ -17,8 +17,8 @@ def grid_fill(widget):
 
 class ImageDisplay(ttk.Frame):
 
-    def __init__(self, parent, path):
-        super().__init__(master=parent, padding='5 5 5 5')
+    def __init__(self, parent, path, **kwargs):
+        super().__init__(master=parent, **kwargs)
         self.img = Image.open(path)
 
         self.tkimg = ImageTk.PhotoImage(self.img.resize((400, 300)))
@@ -38,7 +38,8 @@ def cli_display(path):
     root = tk.Tk()
     root.title('knipse - display {}'.format(path))
 
-    imgd = ImageDisplay(root, path)
+    imgd = ImageDisplay(root, path, padding='5 5 5 5')
     grid_fill(imgd)
+    root.bind('<Configure>', print)
 
     root.mainloop()
