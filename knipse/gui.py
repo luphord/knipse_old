@@ -9,6 +9,12 @@ from PIL import ImageTk, Image
 import click
 
 
+def grid_fill(widget):
+    widget.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
+    widget.columnconfigure(0, weight=1)
+    widget.rowconfigure(0, weight=1)
+
+
 class ImageDisplay(ttk.Frame):
 
     def __init__(self, parent, path):
@@ -18,7 +24,8 @@ class ImageDisplay(ttk.Frame):
         self.tkimg = ImageTk.PhotoImage(self.img.resize((400, 300)))
 
         canvas = tk.Canvas(self)
-        canvas.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
+        grid_fill(canvas)
+
         canvas.create_image(0, 0, anchor=tk.NW, image=self.tkimg)
 
 
@@ -32,6 +39,6 @@ def cli_display(path):
     root.title('knipse - display {}'.format(path))
 
     imgd = ImageDisplay(root, path)
-    imgd.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
+    grid_fill(imgd)
 
     root.mainloop()
