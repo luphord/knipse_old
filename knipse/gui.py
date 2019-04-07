@@ -12,15 +12,14 @@ import click
 class ImageDisplay(ttk.Frame):
 
     def __init__(self, parent, path):
-        super().__init__(master=parent, padding='3 3 12 12')
-        img = Image.open(path)
-        img = img.resize((800, 600))
+        super().__init__(master=parent, padding='5 5 5 5')
+        self.img = Image.open(path)
 
-        self.tkimg = ImageTk.PhotoImage(img)
+        self.tkimg = ImageTk.PhotoImage(self.img.resize((400, 300)))
 
         canvas = tk.Canvas(self)
         canvas.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
-        canvas.create_image(100, 100, image=self.tkimg)
+        canvas.create_image(0, 0, anchor=tk.NW, image=self.tkimg)
 
 
 @click.command(name='display')
