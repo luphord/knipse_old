@@ -29,6 +29,8 @@ class ImageDisplay(ttk.Frame):
         ratio = min(width/self.img.size[0], height/self.img.size[1])
         new_size = (int(ratio * self.img.size[0]),
                     int(ratio * self.img.size[1]))
+        if new_size[0] <= 0 or new_size[1] <= 0:
+            return  # avoid exception on resizing
         resized_img = self.img.resize(new_size)
         self.tkimg = ImageTk.PhotoImage(resized_img)
         if self.imgid is not None:
