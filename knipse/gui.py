@@ -20,13 +20,21 @@ class ImageDisplay(ttk.Frame):
     def __init__(self, parent, path, **kwargs):
         super().__init__(master=parent, **kwargs)
         self.img = Image.open(path)
+        self.imgid = None
+        self.canvas = tk.Canvas(self)
+        grid_fill(self.canvas, self)
+        self.bind('<Configure>', self.on_resize)
 
-        self.tkimg = ImageTk.PhotoImage(self.img.resize((400, 300)))
+    def display(self, width, height):
+        resized_img = self.img.resize((width, height))
+        self.tkimg = ImageTk.PhotoImage(resized_img)
+        if self.imgid is not None:
+            self.canvas.delete(self.imgid)
+        self.imgid = self.canvas.create_image(0, 0, anchor=tk.NW,
+                                              image=self.tkimg)
 
-        canvas = tk.Canvas(self)
-        grid_fill(canvas, self)
-
-        canvas.create_image(0, 0, anchor=tk.NW, image=self.tkimg)
+    def on_resize(self, evt):
+        self.display(evt.width, evt.height)
 
 
 @click.command(name='display')
@@ -40,6 +48,5 @@ def cli_display(path):
 
     imgd = ImageDisplay(root, path, padding='5 5 5 5')
     grid_fill(imgd, root)
-    imgd.bind('<Configure>', print)
 
     root.mainloop()
