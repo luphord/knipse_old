@@ -26,7 +26,10 @@ class ImageDisplay(ttk.Frame):
         self.bind('<Configure>', self.on_resize)
 
     def display(self, width, height):
-        resized_img = self.img.resize((width, height))
+        ratio = min(width/self.img.size[0], height/self.img.size[1])
+        new_size = (int(ratio * self.img.size[0]),
+                    int(ratio * self.img.size[1]))
+        resized_img = self.img.resize(new_size)
         self.tkimg = ImageTk.PhotoImage(resized_img)
         if self.imgid is not None:
             self.canvas.delete(self.imgid)
