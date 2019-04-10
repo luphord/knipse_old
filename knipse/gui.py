@@ -4,6 +4,7 @@
 
 import tkinter as tk
 from tkinter import ttk
+from datetime import datetime, timedelta
 
 from PIL import ImageTk, Image
 import click
@@ -17,15 +18,42 @@ def grid_fill(widget, parent):
 
 class ImageDisplay(ttk.Frame):
 
-    def __init__(self, parent, path, **kwargs):
+    def __init__(self, parent, path, wait_refresh_millis=100, **kwargs):
         super().__init__(master=parent, **kwargs)
+        self.wait = timedelta(milliseconds=wait_refresh_millis) \
+            if wait_refresh_millis else None
+        self.last_refresh_call = datetime.now()
+        self.refresh_requested = False
         self.img = Image.open(path)
         self.imgid = None
         self.canvas = tk.Canvas(self)
         grid_fill(self.canvas, self)
         self.bind('<Configure>', self.on_resize)
 
+    def on_resize(self, evt):
+        if self.wait:
+            self.throttled_display(evt.width, evt.height)
+        else:
+            self.display(evt.width, evt.height)
+
+    def throttled_display(self, width, height):
+        '''Calls `display` but delays until `self.wait` milliseconds
+           if the last request was too recent
+        '''
+        if self.last_refresh_call + self.wait <= datetime.now():
+            self.last_refresh_call = datetime.now()
+            self.refresh_requested = False
+            self.display(width, height)
+        else:
+            if not self.refresh_requested:
+                self.refresh_requested = True
+                millis = int(self.wait.total_seconds() * 1000)
+                self.after(millis, self.throttled_display, width, height)
+
     def display(self, width, height):
+        '''Displays the image with a new given width and height.
+           This method is intended to be regularly called on resize.
+        '''
         ratio = min(width/self.img.size[0], height/self.img.size[1])
         new_size = (int(ratio * self.img.size[0]),
                     int(ratio * self.img.size[1]))
@@ -38,9 +66,6 @@ class ImageDisplay(ttk.Frame):
         self.imgid = self.canvas.create_image(0, 0, anchor=tk.NW,
                                               image=self.tkimg)
 
-    def on_resize(self, evt):
-        self.display(evt.width, evt.height)
-
 
 @click.command(name='display')
 @click.argument('path',
@@ -51,7 +76,7 @@ def cli_display(path):
     root = tk.Tk()
     root.title('knipse - display {}'.format(path))
 
-    imgd = ImageDisplay(root, path, padding='5 5 5 5')
+    imgd = ImageDisplay(root, path, wait_refresh_millis=100, padding='5 5 5 5')
     grid_fill(imgd, root)
 
     root.mainloop()
