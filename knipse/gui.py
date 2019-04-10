@@ -32,23 +32,25 @@ class ImageDisplay(ttk.Frame):
 
     def on_resize(self, evt):
         if self.wait:
-            self.throttled_display(evt.width, evt.height)
+            self.width = evt.width
+            self.height = evt.height
+            self.throttled_display()
         else:
             self.display(evt.width, evt.height)
 
-    def throttled_display(self, width, height):
+    def throttled_display(self):
         '''Calls `display` but delays until `self.wait` milliseconds
            if the last request was too recent
         '''
         if self.last_refresh_call + self.wait <= datetime.now():
             self.last_refresh_call = datetime.now()
             self.refresh_requested = False
-            self.display(width, height)
+            self.display(self.width, self.height)
         else:
             if not self.refresh_requested:
                 self.refresh_requested = True
                 millis = int(self.wait.total_seconds() * 1000)
-                self.after(millis, self.throttled_display, width, height)
+                self.after(millis, self.throttled_display)
 
     def display(self, width, height):
         '''Displays the image with a new given width and height.
@@ -76,7 +78,7 @@ def cli_display(path):
     root = tk.Tk()
     root.title('knipse - display {}'.format(path))
 
-    imgd = ImageDisplay(root, path, wait_refresh_millis=100, padding='5 5 5 5')
+    imgd = ImageDisplay(root, path, wait_refresh_millis=50, padding='5 5 5 5')
     grid_fill(imgd, root)
 
     root.mainloop()
