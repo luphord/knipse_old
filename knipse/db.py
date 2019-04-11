@@ -25,6 +25,7 @@ _GET_FILTER = '''SELECT path FROM images;'''
 
 _GET_IMAGES = '''SELECT * FROM images;'''
 
+
 class KnipseDB:
 
     def __init__(self, connection_string: str):
