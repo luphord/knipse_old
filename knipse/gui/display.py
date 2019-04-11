@@ -27,10 +27,18 @@ class ImageDisplay(ttk.Frame):
         self.img = Image.open(path)
         self.imgid = None
         self.canvas = tk.Canvas(self)
+        self.canvas.create_text(10, 10, anchor=tk.NW, fill='black',
+                                font=('Helvetica', 10),
+                                text='Loading {}...'.format(path))
+        self.first = True
         grid_fill(self.canvas, self)
         self.bind('<Configure>', self.on_resize)
 
     def on_resize(self, evt):
+        if self.first:
+            self.first = False
+            self.after(100, self.on_resize, evt)
+            return
         if self.wait:
             self.width = evt.width
             self.height = evt.height
@@ -56,6 +64,7 @@ class ImageDisplay(ttk.Frame):
         '''Displays the image with a new given width and height.
            This method is intended to be regularly called on resize.
         '''
+        self.img.load()  # takes time on first run, no-op afterwards
         ratio = min(width/self.img.size[0], height/self.img.size[1])
         new_size = (int(ratio * self.img.size[0]),
                     int(ratio * self.img.size[1]))
