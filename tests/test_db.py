@@ -10,6 +10,12 @@ from knipse.walk import walk_images
 from .test_walk import EXPECTED_IMAGES
 
 
+def store_images(db, base_folder):
+    for file_path, img, progress in walk_images(base_folder):
+        descr = descriptor_from_image(base_folder, file_path, img)
+        db.store(descr)
+
+
 class TestKnipseDatabase(unittest.TestCase):
 
     def setUp(self):
@@ -25,9 +31,7 @@ class TestKnipseDatabase(unittest.TestCase):
         self.assertIn('images', tables)
 
     def test_storing_image_descriptors(self):
-        for file_path, img, progress in walk_images(self.src):
-            descr = descriptor_from_image(self.src, file_path, img)
-            self.db.store(descr)
+        store_images(self.db, self.src)
         with self.db.db as conn:
             cnt = conn.execute('SELECT count(*) FROM images;').fetchone()[0]
             self.assertEqual(len(EXPECTED_IMAGES), cnt)
