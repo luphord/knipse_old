@@ -23,6 +23,7 @@ _INSERT_IMAGE = \
 
 _GET_FILTER = '''SELECT path FROM images;'''
 
+_GET_IMAGES = '''SELECT * FROM images;'''
 
 class KnipseDB:
 
@@ -54,3 +55,8 @@ class KnipseDB:
             return str(path.relative_to(source)) not in known_files
 
         return _filter
+
+    def list_images(self):
+        with self.db as conn:
+            for row in conn.execute(_GET_IMAGES):
+                yield ImageDescriptor(*row)
