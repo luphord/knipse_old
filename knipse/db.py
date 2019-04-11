@@ -21,6 +21,8 @@ _INSERT_IMAGE = \
     );
     '''
 
+_GET_FILTER = '''SELECT path FROM images;'''
+
 
 class KnipseDB:
 
@@ -42,3 +44,13 @@ class KnipseDB:
                 descriptor.dhash
             )
             conn.execute(_INSERT_IMAGE, data)
+
+    def get_known_images_filter(self):
+        with self.db as conn:
+            known_files = set(row[0]
+                              for row in conn.execute(_GET_FILTER))
+
+        def _filter(source, path):
+            return str(path.relative_to(source)) not in known_files
+
+        return _filter

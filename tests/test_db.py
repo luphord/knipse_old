@@ -35,3 +35,11 @@ class TestKnipseDatabase(unittest.TestCase):
         with self.db.db as conn:
             cnt = conn.execute('SELECT count(*) FROM images;').fetchone()[0]
             self.assertEqual(len(EXPECTED_IMAGES), cnt)
+
+    def test_walking_known_images_in_db(self):
+        '''Walk a folder structure, store all images, then
+           walk again and test they are all known'''
+        store_images(self.db, self.src)
+        filter = self.db.get_known_images_filter()
+        for file_path, img, progress in walk_images(self.src, filter):
+            raise Exception('should not happen')
