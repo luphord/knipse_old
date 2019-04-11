@@ -5,12 +5,7 @@ from pathlib import Path
 
 from knipse.walk import walk_images
 
-
-class TestImageWalking(unittest.TestCase):
-
-    def setUp(self):
-        self.src = Path(__file__).resolve().parent / 'images' / 'various'
-        self.expected_images = [
+EXPECTED_IMAGES = [
             'img_0002.jpg',
             'folder1/img_0001.jpg',
             'folder1/img_0000.jpg',
@@ -23,6 +18,13 @@ class TestImageWalking(unittest.TestCase):
             'folder2/folder3/img_0006.jpg',
             'folder2/folder3/img_0004.jpg'
         ]
+
+
+class TestImageWalking(unittest.TestCase):
+
+    def setUp(self):
+        self.src = Path(__file__).resolve().parent / 'images' / 'various'
+        self.expected_images = EXPECTED_IMAGES
 
     def test_walking(self):
         '''Test walking images within a folder structure'''
