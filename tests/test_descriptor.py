@@ -11,7 +11,7 @@ from knipse.image import descriptor_from_image, path_and_modification
 from knipse.walk import walk_images
 
 
-def _does_not_contain_forest(source, path):
+def _does_not_contain_forest(source, path, _):
     rel_path, modified_at = path_and_modification(source, path)
     return 'forest' not in str(rel_path).lower()
 

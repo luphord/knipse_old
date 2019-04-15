@@ -1,19 +1,22 @@
 # -*- coding: utf-8 -*-
 
 from pathlib import Path
+from datetime import datetime
 from typing import List, Callable, Optional, Iterable, Tuple  # noqa: 401
 
 import click
 from PIL import Image
 
 from .image import descriptor_from_image
+from .util import get_modification_time
 
 
 _files_to_folders_heuristic = 0.1
 
 
 def walk_images(base_folder: Path,
-                filter: Optional[Callable[[Path, Path], bool]] = None) \
+                filter: Optional[Callable[[Path, Path, datetime], bool]]
+                = None) \
         -> Iterable[Tuple[Path, Image.Image, float]]:
     '''Walk all folders below `base_folder` and yield contained images'''
     folder_tree = [[(Path(base_folder).resolve(), 0.0, 1.0)]]
@@ -41,7 +44,8 @@ def walk_images(base_folder: Path,
             local_progress += 1 / len(files)
             try:
                 progress = lower + (local_higher - lower) * local_progress
-                if not filter or filter(base_folder, file_path):
+                mtime = get_modification_time(file_path)
+                if not filter or filter(base_folder, file_path, mtime):
                     img = Image.open(file_path)
                     yield file_path, img, progress
             except IOError:

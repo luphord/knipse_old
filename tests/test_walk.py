@@ -4,6 +4,8 @@ import unittest
 from pathlib import Path
 
 from knipse.walk import walk_images
+from knipse.util import get_modification_time
+
 
 EXPECTED_IMAGES = [
             'img_0002.jpg',
@@ -37,12 +39,15 @@ class TestImageWalking(unittest.TestCase):
     def test_walking_and_remembering(self):
         '''Walk a folder structure, remember all images
            and filter them on next walk'''
-        known_files = []
+        known_files = {}
         for file_path, img, progress in walk_images(self.src):
-            known_files.append(file_path.relative_to(self.src))
+            mtime = get_modification_time(file_path)
+            known_files[file_path.relative_to(self.src)] = mtime
 
-        def _filter(source, path):
-            return path.relative_to(source) not in known_files
+        def _filter(source, path, mtime):
+            rel_path = path.relative_to(source)
+            return rel_path not in known_files \
+                or known_files[rel_path] != mtime
 
         for file_path, img, progress in walk_images(self.src, _filter):
             raise Exception('should not happen')

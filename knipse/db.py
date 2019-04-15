@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import sqlite3
+from datetime import datetime
 
 from .descriptor import ImageDescriptor
 
@@ -21,9 +22,11 @@ _INSERT_IMAGE = \
     );
     '''
 
-_GET_FILTER = '''SELECT path FROM images;'''
+_GET_FILTER = '''SELECT path, modified_at FROM images;'''
 
 _GET_IMAGES = '''SELECT * FROM images;'''
+
+_DT_FMT = '''%Y-%m-%d %H:%M:%S.%f'''
 
 
 class KnipseDB:
@@ -49,11 +52,13 @@ class KnipseDB:
 
     def get_known_images_filter(self):
         with self.db as conn:
-            known_files = set(row[0]
-                              for row in conn.execute(_GET_FILTER))
+            known_files = {row[0]: datetime.strptime(row[1], _DT_FMT)
+                           for row in conn.execute(_GET_FILTER)}
 
-        def _filter(source, path):
-            return str(path.relative_to(source)) not in known_files
+        def _filter(source, path, mtime):
+            rel_path = str(path.relative_to(source))
+            return rel_path not in known_files \
+                or known_files[rel_path] != mtime
 
         return _filter
 
