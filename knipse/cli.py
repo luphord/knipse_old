@@ -2,6 +2,7 @@
 
 """Console script for knipse."""
 import sys
+import os
 import click
 
 from .db import KnipseDB
@@ -14,8 +15,8 @@ from .gui import cli_display
 @click.group(name='knipse')
 @click.option('-d', '--database',
               type=click.Path(file_okay=True, dir_okay=False,
-                              resolve_path=True,),
-              default='knipse.sqlite',
+                              resolve_path=True),
+              default=os.path.join(os.path.expanduser('~'), '.knipse.sqlite'),
               show_default=True,
               help='Knipse database to use')
 @click.pass_context
@@ -29,6 +30,7 @@ def cli_knipse(ctx, database):
 @click.command(name='list')
 @click.pass_context
 def cli_list(ctx):
+    '''List all images contained in database'''
     db = ctx.obj['database']
     for descr in db.list_images():
         click.echo(descr)
