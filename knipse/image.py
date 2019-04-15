@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import os
 from pathlib import Path
 from datetime import datetime
 import hashlib
@@ -10,15 +9,11 @@ from PIL import Image
 
 from .descriptor import ImageDescriptor
 from .dhash import dhash_bytes
+from .util import get_modification_time
 
 
 class _EXIF:
     CREATION_DATE = 36867
-
-
-def _get_modification_time(path: Path) -> datetime:
-    # getmtime does not support Path in Python 3.5 -> need to convert to str
-    return datetime.fromtimestamp(os.path.getmtime(str(path)))
 
 
 def _get_creation_time(path: Path, img: Image) -> Optional[datetime]:
@@ -45,7 +40,7 @@ def path_and_modification(source: Path, path: Path) -> Tuple[Path, datetime]:
     '''Returns relative path to `source` and modification time of `path`'''
     source = Path(source).resolve()
     path = Path(path).resolve()
-    modified_at = _get_modification_time(path)
+    modified_at = get_modification_time(path)
     return path.relative_to(source), modified_at
 
 
