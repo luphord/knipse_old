@@ -26,7 +26,7 @@ class TestImageWalking(unittest.TestCase):
 
     def setUp(self):
         self.src = Path(__file__).resolve().parent / 'images' / 'various'
-        self.expected_images = EXPECTED_IMAGES
+        self.expected_images = EXPECTED_IMAGES.copy()
 
     def test_walking(self):
         '''Test walking images within a folder structure'''
