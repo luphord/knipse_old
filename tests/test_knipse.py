@@ -30,4 +30,7 @@ class TestKnipse(unittest.TestCase):
         assert 'photo' in result.output
         help_result = runner.invoke(cli.cli_knipse, ['--help'])
         assert help_result.exit_code == 0
-        assert '--help  Show this message and exit.' in help_result.output
+        # number of spaces between `--help` and rest may change as further
+        # options are added to the cli (-> separate assertions)
+        assert '--help' in help_result.output
+        assert 'Show this message and exit.' in help_result.output
