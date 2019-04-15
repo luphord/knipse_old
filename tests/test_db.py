@@ -6,6 +6,7 @@ from pathlib import Path
 from knipse.db import KnipseDB
 from knipse.image import descriptor_from_image
 from knipse.walk import walk_images
+from knipse.scan import scan_images
 
 from .test_walk import EXPECTED_IMAGES
 
@@ -42,4 +43,14 @@ class TestKnipseDatabase(unittest.TestCase):
         store_images(self.db, self.src)
         filter = self.db.get_known_images_filter()
         for file_path, img, progress in walk_images(self.src, filter):
+            raise Exception('should not happen')
+
+    def test_scan_and_scan_again(self):
+        '''Scan a folder sctructure to store images,
+           then scan again and test if they are all known'''
+        cnt = 0
+        for file_path, progress in scan_images(self.db, self.src):
+            cnt += 1
+        self.assertEqual(len(EXPECTED_IMAGES), cnt)
+        for file_path, progress in scan_images(self.db, self.src):
             raise Exception('should not happen')
