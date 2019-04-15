@@ -40,11 +40,15 @@ class KnipseDB:
             conn.execute(_CREATE_IMAGE_TABLE)
 
     def store(self, descriptor: ImageDescriptor):
+        created_at = datetime.strftime(descriptor.created_at, _DT_FMT) \
+            if descriptor.created_at else None
+        modified_at = datetime.strftime(descriptor.modified_at, _DT_FMT) \
+            if descriptor.modified_at else None
         with self.db as conn:
             data = (
                 str(descriptor.path),
-                descriptor.created_at,
-                descriptor.modified_at,
+                created_at,
+                modified_at,
                 descriptor.md5,
                 descriptor.dhash
             )
