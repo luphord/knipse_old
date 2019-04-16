@@ -23,6 +23,17 @@ _INSERT_IMAGE = \
     );
     '''
 
+_UPDATE_IMAGE = \
+    '''UPDATE images
+       SET
+         path = ?,
+         created_at = ?,
+         modified_at = ?,
+         md5 = ?,
+         dhash = ?
+       WHERE rowid=?;
+    '''
+
 _GET_IMAGES = '''SELECT rowid, * FROM images;'''
 
 _DT_FMT = '''%Y-%m-%d %H:%M:%S.%f'''
@@ -52,7 +63,10 @@ class KnipseDB:
                 descriptor.md5,
                 descriptor.dhash
             )
-            conn.execute(_INSERT_IMAGE, data)
+            if descriptor.image_id is None:
+                conn.execute(_INSERT_IMAGE, data)
+            else:
+                conn.execute(_UPDATE_IMAGE, (*data, descriptor.image_id))
 
     def list_images(self):
         '''Get images contained in database as `ImageDescriptor` instances'''

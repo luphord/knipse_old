@@ -23,6 +23,15 @@ class TestKnipseDatabase(unittest.TestCase):
     def setUp(self):
         self.src = Path(__file__).resolve().parent / 'images' / 'various'
         self.db = KnipseDB(':memory:')
+        self.example_descriptor = \
+            ImageDescriptor(
+                None,
+                Path('photo01.jpg'),
+                None,
+                None,
+                b'\x1d@@L\x99_n\x88L)\xb1\xe4\xef\xe1\xca\x15',
+                b'\xf1\xf8\xf8\xf1\xfc\xfc\xf4\xf5\x08\xf1\xec' +
+                b'\x00\x19\xff\xfe\xfc')
 
     def test_table_creation(self):
         with self.db.db as conn:
@@ -39,18 +48,18 @@ class TestKnipseDatabase(unittest.TestCase):
             self.assertEqual(len(EXPECTED_IMAGES), cnt)
 
     def test_storing_null_dates(self):
-        descr = ImageDescriptor(
-                    None,
-                    Path('photo01.jpg'),
-                    None,
-                    None,
-                    b'\x1d@@L\x99_n\x88L)\xb1\xe4\xef\xe1\xca\x15',
-                    b'\xf1\xf8\xf8\xf1\xfc\xfc\xf4\xf5\x08\xf1\xec' +
-                    b'\x00\x19\xff\xfe\xfc')
-        self.db.store(descr)
+        self.db.store(self.example_descriptor)
         retrieved_descr = list(self.db.list_images())[0]
         retrieved_descr.image_id = None
-        self.assertEqual(descr, retrieved_descr)
+        self.assertEqual(self.example_descriptor, retrieved_descr)
+
+    def test_storing_and_updating(self):
+        self.db.store(self.example_descriptor)
+        retrieved_images = list(self.db.list_images())
+        self.assertEqual(1, len(retrieved_images))
+        retrieved_descr = retrieved_images[0]
+        self.db.store(retrieved_descr)  # should only update, not insert
+        self.assertEqual(1, len(list(self.db.list_images())))
 
     def test_walking_known_images_in_db(self):
         '''Walk a folder structure, store all images, then
