@@ -73,10 +73,16 @@ class KnipseDB:
 class ImageRecognizer:
 
     def __init__(self, known_images):
+        known_images = list(known_images)
         self.known_files = {str(descr.path): descr.modified_at
                             for descr in known_images}
+        self.index_md5 = {descr.md5: descr
+                          for descr in known_images}
 
     def filter(self, source, path, mtime):
         rel_path = str(path.relative_to(source))
         return rel_path not in self.known_files \
             or self.known_files[rel_path] != mtime
+
+    def by_md5(self, md5):
+        return self.index_md5.get(md5)
