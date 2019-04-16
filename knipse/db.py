@@ -23,7 +23,7 @@ _INSERT_IMAGE = \
     );
     '''
 
-_GET_IMAGES = '''SELECT * FROM images;'''
+_GET_IMAGES = '''SELECT rowid, * FROM images;'''
 
 _DT_FMT = '''%Y-%m-%d %H:%M:%S.%f'''
 
@@ -59,11 +59,12 @@ class KnipseDB:
         with self.db as conn:
             for row in conn.execute(_GET_IMAGES):
                 yield ImageDescriptor(
-                    Path(row[0]),
-                    datetime.strptime(row[1], _DT_FMT),
+                    row[0],
+                    Path(row[1]),
                     datetime.strptime(row[2], _DT_FMT),
-                    row[3],
-                    row[4]
+                    datetime.strptime(row[3], _DT_FMT),
+                    row[4],
+                    row[5]
                 )
 
     def get_recognizer(self):

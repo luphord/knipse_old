@@ -9,11 +9,13 @@ class ImageDescriptor:
     '''Container for image metadata'''
 
     def __init__(self,
+                 image_id: Optional[int],
                  path: Path,
                  created_at: Optional[datetime],
                  modified_at: datetime,
                  md5: bytes,
                  dhash: bytes) -> None:
+        self.image_id = image_id
         self.path = Path(path)
         self.created_at = created_at
         self.modified_at = modified_at
@@ -21,6 +23,7 @@ class ImageDescriptor:
         self.dhash = dhash
 
     def _fields_iter(self):
+        yield 'image_id', self.image_id
         yield 'path', self.path
         yield 'created_at', self.created_at
         yield 'modified_at', self.modified_at

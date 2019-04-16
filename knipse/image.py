@@ -52,7 +52,8 @@ def descriptor_from_image(source: Path,
     created_at = _get_creation_time(path, img)
     md5 = _md5sum(path)
     dhsh = dhash_bytes(img)
-    return ImageDescriptor(rel_path,
+    return ImageDescriptor(None,
+                           rel_path,
                            created_at,
                            modified_at,
                            md5,

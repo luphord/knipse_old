@@ -26,6 +26,7 @@ class TestImageDescriptor(unittest.TestCase):
     def test_descriptor_regression(self):
         '''Regression test for ImageDescriptor of a particular image'''
         expected = ImageDescriptor(
+                    None,
                     Path('forest/forest_snow.jpg'),
                     datetime(2010, 1, 7, 14, 47, 51),
                     datetime(2019, 3, 24, 13, 20, 50, 302073),
@@ -41,6 +42,7 @@ class TestImageDescriptor(unittest.TestCase):
         self.assertEqual(expected.dhash, actual.dhash)
         # test a second image (this time without exif data)
         expected = ImageDescriptor(
+                    None,
                     Path('photo01.jpg'),
                     None,
                     datetime(2019, 3, 22, 12, 33, 6, 589350),
