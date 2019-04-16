@@ -23,8 +23,6 @@ _INSERT_IMAGE = \
     );
     '''
 
-_GET_FILTER = '''SELECT path, modified_at FROM images;'''
-
 _GET_IMAGES = '''SELECT * FROM images;'''
 
 _DT_FMT = '''%Y-%m-%d %H:%M:%S.%f'''
