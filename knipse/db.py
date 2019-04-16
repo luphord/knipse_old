@@ -2,6 +2,7 @@
 
 import sqlite3
 from datetime import datetime
+from pathlib import Path
 
 from .descriptor import ImageDescriptor
 
@@ -54,19 +55,28 @@ class KnipseDB:
             )
             conn.execute(_INSERT_IMAGE, data)
 
-    def get_known_images_filter(self):
-        with self.db as conn:
-            known_files = {row[0]: datetime.strptime(row[1], _DT_FMT)
-                           for row in conn.execute(_GET_FILTER)}
-
-        def _filter(source, path, mtime):
-            rel_path = str(path.relative_to(source))
-            return rel_path not in known_files \
-                or known_files[rel_path] != mtime
-
-        return _filter
-
     def list_images(self):
         with self.db as conn:
             for row in conn.execute(_GET_IMAGES):
-                yield ImageDescriptor(*row)
+                yield ImageDescriptor(
+                    Path(row[0]),
+                    datetime.strptime(row[1], _DT_FMT),
+                    datetime.strptime(row[2], _DT_FMT),
+                    row[3],
+                    row[4]
+                )
+
+    def get_recognizer(self):
+        return ImageRecognizer(self.list_images())
+
+
+class ImageRecognizer:
+
+    def __init__(self, known_images):
+        self.known_files = {str(descr.path): descr.modified_at
+                            for descr in known_images}
+
+    def filter(self, source, path, mtime):
+        rel_path = str(path.relative_to(source))
+        return rel_path not in self.known_files \
+            or self.known_files[rel_path] != mtime

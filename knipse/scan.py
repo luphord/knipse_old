@@ -15,8 +15,8 @@ def scan_images(db: KnipseDB, base_folder: Path) \
     '''Walk all folders below `base_folder`
        and store contained images in database
     '''
-    filter = db.get_known_images_filter()
-    for file_path, img, progress in walk_images(base_folder, filter):
+    recgn = db.get_recognizer()
+    for file_path, img, progress in walk_images(base_folder, recgn.filter):
         descr = descriptor_from_image(base_folder, file_path, img)
         db.store(descr)
         yield file_path, progress

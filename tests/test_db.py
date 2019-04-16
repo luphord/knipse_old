@@ -41,7 +41,7 @@ class TestKnipseDatabase(unittest.TestCase):
         '''Walk a folder structure, store all images, then
            walk again and test they are all known'''
         store_images(self.db, self.src)
-        filter = self.db.get_known_images_filter()
+        filter = self.db.get_recognizer().filter
         for file_path, img, progress in walk_images(self.src, filter):
             raise Exception('should not happen')
 
