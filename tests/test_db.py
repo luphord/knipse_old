@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 from knipse.db import KnipseDB
+from knipse.descriptor import ImageDescriptor
 from knipse.image import descriptor_from_image
 from knipse.walk import walk_images
 from knipse.scan import scan_images
@@ -36,6 +37,20 @@ class TestKnipseDatabase(unittest.TestCase):
         with self.db.db as conn:
             cnt = conn.execute('SELECT count(*) FROM images;').fetchone()[0]
             self.assertEqual(len(EXPECTED_IMAGES), cnt)
+
+    def test_storing_null_dates(self):
+        descr = ImageDescriptor(
+                    None,
+                    Path('photo01.jpg'),
+                    None,
+                    None,
+                    b'\x1d@@L\x99_n\x88L)\xb1\xe4\xef\xe1\xca\x15',
+                    b'\xf1\xf8\xf8\xf1\xfc\xfc\xf4\xf5\x08\xf1\xec' +
+                    b'\x00\x19\xff\xfe\xfc')
+        self.db.store(descr)
+        retrieved_descr = list(self.db.list_images())[0]
+        retrieved_descr.image_id = None
+        self.assertEqual(descr, retrieved_descr)
 
     def test_walking_known_images_in_db(self):
         '''Walk a folder structure, store all images, then

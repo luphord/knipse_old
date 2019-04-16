@@ -58,11 +58,15 @@ class KnipseDB:
         '''Get images contained in database as `ImageDescriptor` instances'''
         with self.db as conn:
             for row in conn.execute(_GET_IMAGES):
+                created_at = datetime.strptime(row[2], _DT_FMT) \
+                    if row[2] else None
+                modified_at = datetime.strptime(row[3], _DT_FMT) \
+                    if row[3] else None
                 yield ImageDescriptor(
                     row[0],
                     Path(row[1]),
-                    datetime.strptime(row[2], _DT_FMT),
-                    datetime.strptime(row[3], _DT_FMT),
+                    created_at,
+                    modified_at,
                     row[4],
                     row[5]
                 )
