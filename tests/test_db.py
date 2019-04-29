@@ -62,8 +62,11 @@ class TestKnipseDatabase(unittest.TestCase):
         retrieved_descr.image_id = None
         self.assertEqual(self.example_descriptor, retrieved_descr)
 
-    def test_retrieving_invalid_rows(self) -> None:
-        data = (None, None, None, None, None)
+    def test_retrieving_invalid_row_with_null_date(self) -> None:
+        '''Store an invalid image row with a null modification date
+           and test that an error is raised on retrieval.
+        '''
+        data = ('/', None, None, b'0' * 16, b'0' * 16)
         with self.db.db as conn:
             conn.execute(_INSERT_IMAGE, data)
         with self.assertRaises(AssertionError):
