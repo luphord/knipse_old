@@ -40,7 +40,7 @@ _DT_FMT = '''%Y-%m-%d %H:%M:%S.%f'''
 
 
 class KnipseDB:
-    '''Wrapper for the SQLite database in which knipse stores all data'''
+    '''Wrapper for the SQLite database in which knipse stores all data.'''
 
     def __init__(self, connection_string: str):
         self.db = sqlite3.connect(connection_string)
@@ -51,6 +51,9 @@ class KnipseDB:
             conn.execute(_CREATE_IMAGE_TABLE)
 
     def store(self, descriptor: ImageDescriptor):
+        '''Store `descriptor` in the database. If `descriptor` contains
+           an `image_id`, the corresponding row in the database is updated.
+        '''
         created_at = datetime.strftime(descriptor.created_at, _DT_FMT) \
             if descriptor.created_at else None
         modified_at = datetime.strftime(descriptor.modified_at, _DT_FMT) \
@@ -69,7 +72,7 @@ class KnipseDB:
                 conn.execute(_UPDATE_IMAGE, (*data, descriptor.image_id))
 
     def list_images(self):
-        '''Get images contained in database as `ImageDescriptor` instances'''
+        '''Get images contained in database as `ImageDescriptor` instances.'''
         with self.db as conn:
             for row in conn.execute(_GET_IMAGES):
                 created_at = datetime.strptime(row[2], _DT_FMT) \
@@ -102,11 +105,14 @@ class ImageRecognizer:
                           for descr in known_images}
 
     def filter(self, source, path, mtime):
-        '''Filter images by path and modification date'''
+        '''Filter images by path and modification date.
+           Returns `True` if the image is new or modified,
+           `False` if the image is already known.
+        '''
         rel_path = str(path.relative_to(source))
         return rel_path not in self.known_files \
             or self.known_files[rel_path] != mtime
 
     def by_md5(self, md5):
-        '''Lookup images by md5 hash'''
+        '''Lookup images by md5 hash.'''
         return self.index_md5.get(md5)

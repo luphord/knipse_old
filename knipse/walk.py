@@ -18,7 +18,11 @@ def walk_images(base_folder: Path,
                 filter: Optional[Callable[[Path, Path, datetime], bool]]
                 = None) \
         -> Iterable[Tuple[Path, Image.Image, float]]:
-    '''Walk all folders below `base_folder` and yield contained images'''
+    '''Walk all folders below `base_folder` and yield contained images.
+       The `filter` function can be used to skip images, it should return
+       `True` for unknown images (which should be walked) and `False` for
+       known images (which should be ignored).
+    '''
     folder_tree = [[(Path(base_folder).resolve(), 0.0, 1.0)]]
     while folder_tree:
         level = folder_tree.pop()

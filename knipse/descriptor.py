@@ -6,7 +6,10 @@ from typing import Optional
 
 
 class ImageDescriptor:
-    '''Container for image metadata'''
+    '''Container for image metadata like path or modification date.
+       In-memory representation of individual rows of the main
+       database table.
+    '''
 
     def __init__(self,
                  image_id: Optional[int],
