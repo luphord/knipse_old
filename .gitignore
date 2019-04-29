@@ -103,3 +103,4 @@ ENV/
 
 # vscode
 settings.json
+.vscode
