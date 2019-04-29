@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 from datetime import datetime
 
-from knipse.db import KnipseDB
+from knipse.db import KnipseDB, _INSERT_IMAGE
 from knipse.descriptor import ImageDescriptor
 from knipse.image import descriptor_from_image
 from knipse.walk import walk_images
@@ -61,6 +61,13 @@ class TestKnipseDatabase(unittest.TestCase):
         retrieved_descr = list(self.db.list_images())[0]
         retrieved_descr.image_id = None
         self.assertEqual(self.example_descriptor, retrieved_descr)
+
+    def test_retrieving_invalid_rows(self) -> None:
+        data = (None, None, None, None, None)
+        with self.db.db as conn:
+            conn.execute(_INSERT_IMAGE, data)
+        with self.assertRaises(AssertionError):
+            list(self.db.list_images())
 
     def test_storing_and_updating(self) -> None:
         '''Store image in database, then store again
