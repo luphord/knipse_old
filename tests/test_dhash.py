@@ -14,15 +14,15 @@ _expected_hash = \
 
 class TestDifferenceHash(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         img_path = Path(__file__).resolve().parent \
                    / 'images' / 'photo01.jpg'
         self.photo = Image.open(str(img_path))
 
-    def test_dhash_regression(self):
+    def test_dhash_regression(self) -> None:
         self.assertEqual(_expected_hash, dhash_bytes(self.photo))
 
-    def test_dhash_after_resize(self):
+    def test_dhash_after_resize(self) -> None:
         dhsh = dhash_bytes(self.photo)
         photo = self.photo.resize((200, 100), Image.BILINEAR)
         self.assertEqual(dhsh, dhash_bytes(photo))

@@ -2,6 +2,7 @@
 
 import unittest
 from pathlib import Path
+from datetime import datetime
 
 from knipse.walk import walk_images
 from knipse.util import get_modification_time
@@ -24,11 +25,11 @@ EXPECTED_IMAGES = [
 
 class TestImageWalking(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.src = Path(__file__).resolve().parent / 'images' / 'various'
         self.expected_images = EXPECTED_IMAGES.copy()
 
-    def test_walking(self):
+    def test_walking(self) -> None:
         '''Test walking images within a folder structure'''
         for file_path, img, progress in walk_images(self.src):
             p = str(file_path.relative_to(self.src))
@@ -36,7 +37,7 @@ class TestImageWalking(unittest.TestCase):
             self.expected_images.remove(p)
         self.assertEqual(0, len(self.expected_images))
 
-    def test_walking_and_remembering(self):
+    def test_walking_and_remembering(self) -> None:
         '''Walk a folder structure, remember all images
            and filter them on next walk'''
         known_files = {}
@@ -44,7 +45,7 @@ class TestImageWalking(unittest.TestCase):
             mtime = get_modification_time(file_path)
             known_files[file_path.relative_to(self.src)] = mtime
 
-        def _filter(source, path, mtime):
+        def _filter(source: Path, path: Path, mtime: datetime) -> bool:
             rel_path = path.relative_to(source)
             return rel_path not in known_files \
                 or known_files[rel_path] != mtime

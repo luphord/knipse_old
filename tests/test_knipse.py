@@ -9,7 +9,7 @@ from knipse import cli
 
 class TestKnipse(unittest.TestCase):
 
-    def test_command_line_interface(self):
+    def test_command_line_interface(self) -> None:
         '''Test command line interface.'''
         runner = CliRunner()
         result = runner.invoke(cli.cli_knipse)

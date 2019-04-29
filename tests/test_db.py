@@ -13,7 +13,7 @@ from knipse.scan import scan_images
 from .test_walk import EXPECTED_IMAGES
 
 
-def store_images(db, base_folder):
+def store_images(db, base_folder: Path) -> None:
     '''Load descriptors for all images in `base_folder`,
        then store them in database.
     '''
@@ -24,7 +24,7 @@ def store_images(db, base_folder):
 
 class TestKnipseDatabase(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.src = Path(__file__).resolve().parent / 'images' / 'various'
         self.db = KnipseDB(':memory:')
         self.example_descriptor = \
@@ -37,7 +37,7 @@ class TestKnipseDatabase(unittest.TestCase):
                 b'\xf1\xf8\xf8\xf1\xfc\xfc\xf4\xf5\x08\xf1\xec' +
                 b'\x00\x19\xff\xfe\xfc')
 
-    def test_table_creation(self):
+    def test_table_creation(self) -> None:
         '''Check if database tables have been created.'''
         with self.db.db as conn:
             tables = \
@@ -46,14 +46,14 @@ class TestKnipseDatabase(unittest.TestCase):
                      if row[0] == 'table'])
         self.assertIn('images', tables)
 
-    def test_storing_image_descriptors(self):
+    def test_storing_image_descriptors(self) -> None:
         '''Store images in database and check their count.'''
         store_images(self.db, self.src)
         with self.db.db as conn:
             cnt = conn.execute('SELECT count(*) FROM images;').fetchone()[0]
             self.assertEqual(len(EXPECTED_IMAGES), cnt)
 
-    def test_storing_null_dates(self):
+    def test_storing_null_dates(self) -> None:
         '''Store image with creation and modification date
            set to None (should be null in database).
         '''
@@ -62,7 +62,7 @@ class TestKnipseDatabase(unittest.TestCase):
         retrieved_descr.image_id = None
         self.assertEqual(self.example_descriptor, retrieved_descr)
 
-    def test_storing_and_updating(self):
+    def test_storing_and_updating(self) -> None:
         '''Store image in database, then store again
            and test if it was updated.
         '''
@@ -73,7 +73,7 @@ class TestKnipseDatabase(unittest.TestCase):
         self.db.store(retrieved_descr)  # should only update, not insert
         self.assertEqual(1, len(list(self.db.list_images())))
 
-    def test_walking_known_images_in_db(self):
+    def test_walking_known_images_in_db(self) -> None:
         '''Walk a folder structure, store all images, then
            walk again and test they are all known.'''
         store_images(self.db, self.src)
@@ -81,7 +81,7 @@ class TestKnipseDatabase(unittest.TestCase):
         for file_path, img, progress in walk_images(self.src, filter):
             raise Exception('should not happen')
 
-    def test_recognizing_images_by_md5(self):
+    def test_recognizing_images_by_md5(self) -> None:
         '''Walk a folder structure, store all images, then
            walk again and test if they are known by md5.'''
         store_images(self.db, self.src)
@@ -91,7 +91,7 @@ class TestKnipseDatabase(unittest.TestCase):
             if not recognizer.by_md5(descr.md5):
                 raise Exception('should not happen')
 
-    def test_scan_and_scan_again(self):
+    def test_scan_and_scan_again(self) -> None:
         '''Scan a folder sctructure to store images,
            then scan again and test if they are all known.'''
         cnt = 0

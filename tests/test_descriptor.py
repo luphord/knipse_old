@@ -11,19 +11,19 @@ from knipse.image import descriptor_from_image, path_and_modification
 from knipse.walk import walk_images
 
 
-def _does_not_contain_forest(source, path, _):
+def _does_not_contain_forest(source: Path, path: Path, _: datetime) -> bool:
     rel_path, modified_at = path_and_modification(source, path)
     return 'forest' not in str(rel_path).lower()
 
 
 class TestImageDescriptor(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.src = Path(__file__).resolve().parent / 'images'
         self.path = self.src / 'forest' / 'forest_snow.jpg'
         self.path2 = self.src / 'photo01.jpg'
 
-    def test_descriptor_regression(self):
+    def test_descriptor_regression(self) -> None:
         '''Regression test for ImageDescriptor of a particular image'''
         expected = ImageDescriptor(
                     None,
@@ -56,15 +56,15 @@ class TestImageDescriptor(unittest.TestCase):
         self.assertEqual(expected.md5, actual.md5)
         self.assertEqual(expected.dhash, actual.dhash)
 
-    def test_filtered_walk(self):
+    def test_filtered_walk(self) -> None:
         '''Test walking a folder with a filter'''
         for file_path, img, progress in walk_images(self.src,
                                                     _does_not_contain_forest):
             p = str(file_path.relative_to(self.src)).lower()
             self.assertTrue('forest' not in p)
 
-    def test_unfiltered_walk(self):
-        '''Test walking a folder with a filter'''
+    def test_unfiltered_walk(self) -> None:
+        '''Test walking a folder without a filter'''
         found = False
         for file_path, img, progress in walk_images(self.src):
             p = str(file_path.relative_to(self.src)).lower()
