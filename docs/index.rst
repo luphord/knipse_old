@@ -1,5 +1,5 @@
-Welcome to Knipse Photo Manager's documentation!
-======================================
+Docs for Knipse Photo Manager
+=============================
 
 .. toctree::
    :maxdepth: 2
