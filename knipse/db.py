@@ -116,6 +116,11 @@ class ImageRecognizer:
         return rel_path not in self.known_files \
             or self.known_files[rel_path] != mtime
 
+    def by_path(self, source: Path, path: Path):
+        '''Lookup images by path.'''
+        rel_path = str(path.relative_to(source))
+        return self.known_files.get(rel_path)
+
     def by_md5(self, md5: bytes) -> Optional[ImageDescriptor]:
         '''Lookup images by md5 hash.'''
         return self.index_md5.get(md5)
