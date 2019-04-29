@@ -2,6 +2,7 @@
 
 import unittest
 from pathlib import Path
+from datetime import datetime
 
 from knipse.db import KnipseDB
 from knipse.descriptor import ImageDescriptor
@@ -31,7 +32,7 @@ class TestKnipseDatabase(unittest.TestCase):
                 None,
                 Path('photo01.jpg'),
                 None,
-                None,
+                datetime(2019, 1, 1, 11, 11, 11),
                 b'\x1d@@L\x99_n\x88L)\xb1\xe4\xef\xe1\xca\x15',
                 b'\xf1\xf8\xf8\xf1\xfc\xfc\xf4\xf5\x08\xf1\xec' +
                 b'\x00\x19\xff\xfe\xfc')
