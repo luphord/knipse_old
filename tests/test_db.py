@@ -84,7 +84,14 @@ class TestKnipseDatabase(unittest.TestCase):
         dt = datetime.strftime(self.example_descriptor.modified_at, _DT_FMT)
         img_id = re.compile('.*image id.*', re.IGNORECASE)
         with self.assertRaisesRegex(AssertionError, img_id):
-            row = (None, '/', None, dt, b'0'*16, b'0'*16)
+            row = (None, '/', None, dt, b'0'*16, b'0'*16)  # type: tuple
+            self.db.descriptor_from_row(row)
+        bad_format = re.compile('.*not match format.*', re.IGNORECASE)
+        with self.assertRaisesRegex(ValueError, bad_format):
+            row = (0, '/', None, 'bad date', b'0'*16, b'0'*16)
+            self.db.descriptor_from_row(row)
+        with self.assertRaisesRegex(ValueError, bad_format):
+            row = (0, '/', 'bad date', dt, b'0'*16, b'0'*16)
             self.db.descriptor_from_row(row)
 
     def test_storing_and_updating(self) -> None:
