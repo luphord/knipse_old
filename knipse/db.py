@@ -75,16 +75,15 @@ class KnipseDB:
     def descriptor_from_row(self, row: tuple) -> ImageDescriptor:
         '''Parse, check and convert a database row to an `ImageDescriptor`.'''
         assert len(row) == 6, 'Row length must be 6, got {}'.format(len(row))
-        assert isinstance(row[0], int), \
+        image_id, path, created_at_str, modified_at_str, md5, dhash = row
+        assert isinstance(image_id, int), \
             'Image ID must be of type int, got {} of type {}' \
-            .format(row[0], type(row[0]))
-        created_at = datetime.strptime(row[2], _DT_FMT) \
-            if row[2] else None
-        modified_at_str = row[3]
+            .format(image_id, type(image_id))
+        created_at = datetime.strptime(created_at_str, _DT_FMT) \
+            if created_at_str else None
         assert modified_at_str is not None, \
             'Modification date in row {} may not be None'.format(row)
         modified_at = datetime.strptime(modified_at_str, _DT_FMT)
-        md5 = row[4]
         assert md5 is not None, \
             'md5 hash in row {} may not be None'.format(row)
         assert isinstance(md5, bytes), \
@@ -92,7 +91,6 @@ class KnipseDB:
             .format(md5, type(md5))
         assert len(md5) == 16, \
             'md5 hash must be of length 16, got {}'.format(len(md5))
-        dhash = row[5]
         assert dhash is not None, \
             'perceptual hash in row {} may not be None'.format(row)
         assert isinstance(dhash, bytes), \
@@ -101,8 +99,8 @@ class KnipseDB:
         assert len(dhash) == 16, \
             'perceptual hash must be of length 16, got {}'.format(len(dhash))
         return ImageDescriptor(
-                    row[0],
-                    Path(row[1]),
+                    image_id,
+                    Path(path),
                     created_at,
                     modified_at,
                     md5,
