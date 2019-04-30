@@ -75,10 +75,16 @@ class KnipseDB:
     def descriptor_from_row(self, row: tuple) -> ImageDescriptor:
         '''Parse, check and convert a database row to an `ImageDescriptor`.'''
         assert len(row) == 6, 'Row length must be 6, got {}'.format(len(row))
-        image_id, path, created_at_str, modified_at_str, md5, dhash = row
+        image_id, path_str, created_at_str, modified_at_str, md5, dhash = row
         assert isinstance(image_id, int), \
             'Image ID must be of type int, got {} of type {}' \
             .format(image_id, type(image_id))
+        assert path_str is not None, \
+            'path in row {} may not be None'.format(row)
+        assert isinstance(path_str, str), \
+            'path must be of type string, got {} of type {}' \
+            .format(path_str, type(path_str))
+        path = Path(path_str)
         created_at = datetime.strptime(created_at_str, _DT_FMT) \
             if created_at_str else None
         assert modified_at_str is not None, \
