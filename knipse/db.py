@@ -90,6 +90,8 @@ class KnipseDB:
         assert isinstance(md5, bytes), \
             'md5 hash must be of type bytes, got {} of type {}' \
             .format(md5, type(md5))
+        assert len(md5) == 16, \
+            'md5 hash must be of length 16, got {}'.format(len(md5))
         return ImageDescriptor(
                     row[0],
                     Path(row[1]),
