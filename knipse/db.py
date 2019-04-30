@@ -84,12 +84,15 @@ class KnipseDB:
         assert modified_at_str is not None, \
             'Modification date in row {} may not be None'.format(row)
         modified_at = datetime.strptime(modified_at_str, _DT_FMT)
+        md5 = row[4]
+        assert md5 is not None, \
+            'md5 hash in row {} may not be None'.format(row)
         return ImageDescriptor(
                     row[0],
                     Path(row[1]),
                     created_at,
                     modified_at,
-                    row[4],
+                    md5,
                     row[5]
                 )
 

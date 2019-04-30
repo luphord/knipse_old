@@ -93,6 +93,10 @@ class TestKnipseDatabase(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, bad_format):
             row = (0, '/', 'bad date', dt, b'0'*16, b'0'*16)
             self.db.descriptor_from_row(row)
+        md5 = re.compile('.*md5.*', re.IGNORECASE)
+        with self.assertRaisesRegex(AssertionError, md5):
+            row = (0, '/', None, dt, None, b'0'*16)
+            self.db.descriptor_from_row(row)
 
     def test_storing_and_updating(self) -> None:
         '''Store image in database, then store again
