@@ -72,17 +72,16 @@ class KnipseDB:
             else:
                 conn.execute(_UPDATE_IMAGE, (*data, descriptor.image_id))
 
-    def list_images(self) -> Iterable[ImageDescriptor]:
-        '''Get images contained in database as `ImageDescriptor` instances.'''
-        with self.db as conn:
-            for row in conn.execute(_GET_IMAGES):
-                created_at = datetime.strptime(row[2], _DT_FMT) \
-                    if row[2] else None
-                modified_at_str = row[3]
-                assert modified_at_str is not None, \
-                    'Modification date in row {} may not be None'.format(row)
-                modified_at = datetime.strptime(modified_at_str, _DT_FMT)
-                yield ImageDescriptor(
+    def descriptor_from_row(self, row: tuple) -> ImageDescriptor:
+        '''Parse, check and convert a database row to an `ImageDescriptor`.'''
+        assert len(row) == 6, 'Row length must be 6, got {}'.format(len(row))
+        created_at = datetime.strptime(row[2], _DT_FMT) \
+            if row[2] else None
+        modified_at_str = row[3]
+        assert modified_at_str is not None, \
+            'Modification date in row {} may not be None'.format(row)
+        modified_at = datetime.strptime(modified_at_str, _DT_FMT)
+        return ImageDescriptor(
                     row[0],
                     Path(row[1]),
                     created_at,
@@ -90,6 +89,12 @@ class KnipseDB:
                     row[4],
                     row[5]
                 )
+
+    def list_images(self) -> Iterable[ImageDescriptor]:
+        '''Get images contained in database as `ImageDescriptor` instances.'''
+        with self.db as conn:
+            for row in conn.execute(_GET_IMAGES):
+                yield self.descriptor_from_row(row)
 
     def get_recognizer(self) -> 'ImageRecognizer':
         return ImageRecognizer(self.list_images())
