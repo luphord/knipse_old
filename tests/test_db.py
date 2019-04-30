@@ -3,6 +3,7 @@
 import unittest
 from pathlib import Path
 from datetime import datetime
+import re
 
 from knipse.db import KnipseDB, _INSERT_IMAGE
 from knipse.descriptor import ImageDescriptor
@@ -71,6 +72,15 @@ class TestKnipseDatabase(unittest.TestCase):
             conn.execute(_INSERT_IMAGE, data)
         with self.assertRaises(AssertionError):
             list(self.db.list_images())
+
+    def test_invalid_row_conversion(self) -> None:
+        '''Test proper errors for invalid database rows.'''
+        row_length = re.compile('.*row length.*', re.IGNORECASE)
+        with self.assertRaisesRegex(AssertionError, row_length):
+            self.db.descriptor_from_row(())
+        mod_date = re.compile('.*modification date.*', re.IGNORECASE)
+        with self.assertRaisesRegex(AssertionError, mod_date):
+            self.db.descriptor_from_row((0, '/', None, None, b'0'*16, b'0'*16))
 
     def test_storing_and_updating(self) -> None:
         '''Store image in database, then store again
