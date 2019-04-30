@@ -87,6 +87,9 @@ class KnipseDB:
         md5 = row[4]
         assert md5 is not None, \
             'md5 hash in row {} may not be None'.format(row)
+        assert isinstance(md5, bytes), \
+            'md5 hash must be of type bytes, got {} of type {}' \
+            .format(md5, type(md5))
         return ImageDescriptor(
                     row[0],
                     Path(row[1]),
