@@ -92,13 +92,21 @@ class KnipseDB:
             .format(md5, type(md5))
         assert len(md5) == 16, \
             'md5 hash must be of length 16, got {}'.format(len(md5))
+        dhash = row[5]
+        assert dhash is not None, \
+            'perceptual hash in row {} may not be None'.format(row)
+        assert isinstance(dhash, bytes), \
+            'perceptual hash must be of type bytes, got {} of type {}' \
+            .format(dhash, type(dhash))
+        assert len(dhash) == 16, \
+            'perceptual hash must be of length 16, got {}'.format(len(dhash))
         return ImageDescriptor(
                     row[0],
                     Path(row[1]),
                     created_at,
                     modified_at,
                     md5,
-                    row[5]
+                    dhash
                 )
 
     def list_images(self) -> Iterable[ImageDescriptor]:
