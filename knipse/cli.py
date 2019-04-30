@@ -20,11 +20,18 @@ from .gui import cli_display
               default=os.path.join(os.path.expanduser('~'), '.knipse.sqlite'),
               show_default=True,
               help='Knipse database to use')
+@click.option('-s', '--source',
+              type=click.Path(exists=True, file_okay=False, dir_okay=True,
+                              resolve_path=True),
+              default=os.path.expanduser('~'),
+              show_default=True,
+              help='base folder of image source')
 @click.pass_context
-def cli_knipse(ctx, database):
+def cli_knipse(ctx, database, source):
     '''Manage your photo collections and lists.'''
     ctx.ensure_object(dict)
     ctx.obj['database'] = KnipseDB(database)
+    ctx.obj['source'] = source
     return 0
 
 

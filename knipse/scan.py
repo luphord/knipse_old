@@ -23,14 +23,12 @@ def scan_images(db: KnipseDB, base_folder: Path) \
 
 
 @click.command(name='scan')
-@click.argument('base_folder',
-                type=click.Path(exists=True, file_okay=False, dir_okay=True,
-                                resolve_path=True), default='.')
 @click.pass_context
-def cli_scan(ctx, base_folder):
+def cli_scan(ctx):
     '''Walk all folders below `base_folder`
        and store contained images in database
     '''
     db = ctx.obj['database']
+    base_folder = ctx.obj['source']
     for file_path, progress in scan_images(db, base_folder):
         click.echo('{:.1f}%\t{}'.format(progress * 100, file_path))
