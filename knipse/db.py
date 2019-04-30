@@ -75,6 +75,9 @@ class KnipseDB:
     def descriptor_from_row(self, row: tuple) -> ImageDescriptor:
         '''Parse, check and convert a database row to an `ImageDescriptor`.'''
         assert len(row) == 6, 'Row length must be 6, got {}'.format(len(row))
+        assert isinstance(row[0], int), \
+            'Image ID must be of type int, got {} of type {}' \
+            .format(row[0], type(row[0]))
         created_at = datetime.strptime(row[2], _DT_FMT) \
             if row[2] else None
         modified_at_str = row[3]

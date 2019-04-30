@@ -5,7 +5,7 @@ from pathlib import Path
 from datetime import datetime
 import re
 
-from knipse.db import KnipseDB, _INSERT_IMAGE
+from knipse.db import KnipseDB, _INSERT_IMAGE, _DT_FMT
 from knipse.descriptor import ImageDescriptor
 from knipse.image import descriptor_from_image
 from knipse.walk import walk_images
@@ -81,6 +81,11 @@ class TestKnipseDatabase(unittest.TestCase):
         mod_date = re.compile('.*modification date.*', re.IGNORECASE)
         with self.assertRaisesRegex(AssertionError, mod_date):
             self.db.descriptor_from_row((0, '/', None, None, b'0'*16, b'0'*16))
+        dt = datetime.strftime(self.example_descriptor.modified_at, _DT_FMT)
+        img_id = re.compile('.*image id.*', re.IGNORECASE)
+        with self.assertRaisesRegex(AssertionError, img_id):
+            row = (None, '/', None, dt, b'0'*16, b'0'*16)
+            self.db.descriptor_from_row(row)
 
     def test_storing_and_updating(self) -> None:
         '''Store image in database, then store again
