@@ -48,6 +48,8 @@ def walk_images(base_folder: Path,
             local_progress += 1 / len(files)
             try:
                 progress = lower + (local_higher - lower) * local_progress
+                if file_path.is_symlink():
+                    continue
                 mtime = get_modification_time(file_path)
                 if not filter or filter(base_folder, file_path, mtime):
                     img = Image.open(file_path)
