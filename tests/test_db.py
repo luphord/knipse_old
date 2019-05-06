@@ -140,14 +140,18 @@ class TestKnipseDatabase(unittest.TestCase):
         for file_path, img, progress in walk_images(self.src, filter):
             raise Exception('should not happen')
 
-    def test_recognizing_images_by_md5(self) -> None:
-        '''Walk a folder structure, store all images, then
-           walk again and test if they are known by md5.'''
+    def test_recognizing_images_by_various_attributes(self) -> None:
+        '''Walk a folder structure, store all images, then walk
+           again and test if they are known by various attributes.'''
         store_images(self.db, self.src)
         recognizer = self.db.get_recognizer()
         for file_path, img, progress in walk_images(self.src, None):
             descr = descriptor_from_image(self.src, file_path, img)
             if not recognizer.by_md5(descr.md5):
+                raise Exception('should not happen')
+            if not recognizer.by_path(self.src, file_path):
+                raise Exception('should not happen')
+            if not recognizer.by_path(self.src, self.src / descr.path):
                 raise Exception('should not happen')
 
     def test_scan_and_scan_again(self) -> None:
