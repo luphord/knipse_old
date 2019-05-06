@@ -134,6 +134,8 @@ class ImageRecognizer:
                             for descr in known_images}
         self.index_md5 = {descr.md5: descr
                           for descr in known_images}
+        self.index_dhash = {descr.dhash: descr
+                            for descr in known_images}
 
     def filter(self, source, path, mtime):
         '''Filter images by path and modification date.
@@ -152,3 +154,7 @@ class ImageRecognizer:
     def by_md5(self, md5: bytes) -> Optional[ImageDescriptor]:
         '''Lookup images by md5 hash.'''
         return self.index_md5.get(md5)
+
+    def by_dhash(self, dhash: bytes) -> Optional[ImageDescriptor]:
+        '''Lookup images by dhash perceptual image hash.'''
+        return self.index_dhash.get(dhash)

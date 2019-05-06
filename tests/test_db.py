@@ -153,6 +153,8 @@ class TestKnipseDatabase(unittest.TestCase):
                 raise Exception('should not happen')
             if not recognizer.by_path(self.src, self.src / descr.path):
                 raise Exception('should not happen')
+            if not recognizer.by_dhash(descr.dhash):
+                raise Exception('should not happen')
 
     def test_scan_and_scan_again(self) -> None:
         '''Scan a folder sctructure to store images,
