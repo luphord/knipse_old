@@ -51,14 +51,17 @@ def cli_scan(ctx):
     base_folder = ctx.obj['source']
     click.echo('Scanning images in {}...'.format(base_folder))
     start = datetime.now()
+    line_length = 1
     for file_path, progress in scan_images(db, base_folder):
         rel_path = file_path.relative_to(base_folder)
         remaining = (datetime.now() - start) * (1 - progress)
-        click.echo('\r{:5.1f}% |{:<40s}| ETA {} {:>20s}'
-                   .format(progress * 100,
-                           round(progress * 40) * '#',
-                           _format_timedelta(remaining),
-                           str(rel_path)),
-                   nl=False)
+        click.echo('\r' + ' ' * line_length, nl=False)
+        line = '\r{:5.1f}% |{:<40s}| ETA {}  Scanning {}...' \
+               .format(progress * 100,
+                       round(progress * 40) * '#',
+                       _format_timedelta(remaining),
+                       str(rel_path))
+        line_length = len(line)
+        click.echo(line, nl=False)
     click.echo()
     click.echo('Scan completed')
