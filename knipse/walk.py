@@ -56,6 +56,8 @@ def walk_images(base_folder: Path,
                     yield file_path, img, progress
             except IOError:
                 pass  # not an image
+            except ValueError:
+                pass  # error opening image => we ignore it
         if level:
             folder_tree.append(level)
         if sub_folders:
