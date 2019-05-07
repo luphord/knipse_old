@@ -33,7 +33,10 @@ def cli_scan(ctx):
     click.echo('Scanning images in {}...'.format(base_folder))
     for file_path, progress in scan_images(db, base_folder):
         rel_path = file_path.relative_to(base_folder)
-        click.echo('\r{:5.1f}%\t{:<20s}'.format(progress * 100, str(rel_path)),
+        click.echo('\r{:5.1f}% |{:<40s}| {:<20s}'
+                   .format(progress * 100,
+                           round(progress * 40) * '#',
+                           str(rel_path)),
                    nl=False)
     click.echo()
     click.echo('Scan completed')
