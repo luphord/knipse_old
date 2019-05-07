@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from pathlib import Path
+from datetime import datetime
+from math import floor
 from typing import List, Callable, Optional, Iterable, Tuple  # noqa: 401
 
 import click
@@ -22,6 +24,24 @@ def scan_images(db: KnipseDB, base_folder: Path) \
         yield file_path, progress
 
 
+def _format_timedelta(dt):
+    total_sec = round(dt.total_seconds())
+    days = total_sec // (24 * 60 * 60)
+    sec_remaining = total_sec - days * 24 * 60 * 60
+    hours = sec_remaining // (60 * 60)
+    sec_remaining -= hours * 60 * 60
+    minutes = sec_remaining // 60
+    seconds = sec_remaining - minutes * 60
+    if total_sec < 60:
+        return '{}s'.format(seconds)
+    elif total_sec < 60 * 60:
+        return '{}m {}s'.format(minutes, seconds)
+    elif total_sec < 24 * 60 * 60:
+        return '{}h {}m {}s'.format(hours, minutes, seconds)
+    else:
+        return '{}d {}h {}m {}s'.format(days, hours, minutes, seconds)
+
+
 @click.command(name='scan')
 @click.pass_context
 def cli_scan(ctx):
@@ -31,11 +51,14 @@ def cli_scan(ctx):
     db = ctx.obj['database']
     base_folder = ctx.obj['source']
     click.echo('Scanning images in {}...'.format(base_folder))
+    start = datetime.now()
     for file_path, progress in scan_images(db, base_folder):
         rel_path = file_path.relative_to(base_folder)
-        click.echo('\r{:5.1f}% |{:<40s}| {:<20s}'
+        remaining = (datetime.now() - start) * (1 - progress)
+        click.echo('\r{:5.1f}% |{:<40s}| ETA {} {:>20s}'
                    .format(progress * 100,
                            round(progress * 40) * '#',
+                           _format_timedelta(remaining),
                            str(rel_path)),
                    nl=False)
     click.echo()
