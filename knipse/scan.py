@@ -65,8 +65,8 @@ def cli_scan(ctx):
                        round(progress * 40) * '#',
                        _format_timedelta(remaining),
                        str(rel_path))
-        if len(line) > 80:
-            line = line[:77] + '...'
+        if len(line) > 120:
+            line = line[:117] + '...'
         line_length = len(line)
         click.echo(line, nl=False)
     click.echo()
