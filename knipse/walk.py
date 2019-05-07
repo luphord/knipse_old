@@ -34,6 +34,8 @@ def walk_images(base_folder: Path,
                 files.append(entry)
             elif entry.is_dir():
                 sub_folders.append(entry)
+            elif entry.is_symlink():
+                pass
             else:
                 raise Exception('Unexpected folder entry {}'.format(entry))
         n_sub_folders = len(sub_folders)
