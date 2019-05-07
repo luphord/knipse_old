@@ -2,7 +2,6 @@
 
 from pathlib import Path
 from datetime import datetime
-from math import floor
 from typing import List, Callable, Optional, Iterable, Tuple  # noqa: 401
 
 import click
