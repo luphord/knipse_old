@@ -20,7 +20,7 @@ def scan_images(db: KnipseDB, base_folder: Path) \
     for file_path, img, progress in walk_images(base_folder, recgn.filter):
         try:
             img.load()
-        except IOError:
+        except (IOError, AttributeError):
             continue  # image type is not supported => we ignore it
         descr = descriptor_from_image(base_folder, file_path, img)
         db.store(descr)
