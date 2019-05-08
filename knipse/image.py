@@ -17,11 +17,14 @@ class _EXIF:
 
 
 def _get_creation_time(path: Path, img: Image) -> Optional[datetime]:
-    if hasattr(img, '_getexif'):
-        exif = img._getexif()
-        if exif and _EXIF.CREATION_DATE in exif:
-            return datetime.strptime(exif[_EXIF.CREATION_DATE],
-                                     '%Y:%m:%d %H:%M:%S')
+    try:
+        if hasattr(img, '_getexif'):
+            exif = img._getexif()
+            if exif and _EXIF.CREATION_DATE in exif:
+                return datetime.strptime(exif[_EXIF.CREATION_DATE],
+                                         '%Y:%m:%d %H:%M:%S')
+    except ValueError:
+        return None
     return None
 
 
