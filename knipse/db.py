@@ -14,13 +14,14 @@ _CREATE_IMAGE_TABLE = \
         created_at timestamp,
         modified_at timestamp,
         md5 blob,
-        dhash blob
+        dhash blob,
+        active bool
     );
     '''
 
 _INSERT_IMAGE = \
     '''INSERT INTO images VALUES (
-        ?, ?, ?, ?, ?
+        ?, ?, ?, ?, ?, TRUE
     );
     '''
 
@@ -31,11 +32,22 @@ _UPDATE_IMAGE = \
          created_at = ?,
          modified_at = ?,
          md5 = ?,
-         dhash = ?
+         dhash = ?,
+         active = TRUE
        WHERE rowid=?;
     '''
 
-_GET_IMAGES = '''SELECT rowid, * FROM images;'''
+_GET_IMAGES = \
+    '''SELECT
+         rowid,
+         path,
+         created_at,
+         modified_at,
+         md5,
+         dhash
+       FROM images
+       WHERE
+         active = TRUE;'''
 
 _DT_FMT = '''%Y-%m-%d %H:%M:%S.%f'''
 
