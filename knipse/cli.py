@@ -4,6 +4,7 @@
 import sys
 import os
 import click
+import logging.config
 
 from .db import KnipseDB
 from .dhash import cli_dhash
@@ -11,6 +12,30 @@ from .walk import cli_walk
 from .scan import cli_scan
 from .symlink import cli_symlink
 from .gui import cli_display
+
+
+logging.config.dictConfig({
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+        }
+    },
+    'handlers': {
+        'default': {
+            'level': 'DEBUG',
+            'formatter': 'standard',
+            'class': 'logging.StreamHandler'
+        }
+    },
+    'loggers': {
+        '': {
+            'handlers': ['default'],
+            'level': 'DEBUG'
+        }
+    }
+})
 
 
 @click.group(name='knipse')
