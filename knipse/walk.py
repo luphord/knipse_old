@@ -38,6 +38,9 @@ def walk_images(base_folder: Path,
                 pass
             else:
                 raise Exception('Unexpected folder entry {}'.format(entry))
+        # sort files and sub_folders for lexically ordered walking
+        files.sort()
+        sub_folders.sort()
         n_sub_folders = len(sub_folders)
         file_ratio = _files_to_folders_heuristic \
             / (n_sub_folders + _files_to_folders_heuristic)
