@@ -3,6 +3,7 @@
 from pathlib import Path
 from datetime import datetime
 import hashlib
+import logging
 from typing import Optional, Tuple
 
 from PIL import Image
@@ -12,18 +13,24 @@ from .dhash import dhash_bytes
 from .util import get_modification_time
 
 
+logger = logging.getLogger(__name__)
+
+
 class _EXIF:
     CREATION_DATE = 36867
 
 
 def _get_creation_time(path: Path, img: Image) -> Optional[datetime]:
-    try:
-        if hasattr(img, '_getexif'):
-            exif = img._getexif()
-            if exif and _EXIF.CREATION_DATE in exif:
-                return datetime.strptime(exif[_EXIF.CREATION_DATE],
+    if hasattr(img, '_getexif'):
+        exif = img._getexif()
+        if exif and _EXIF.CREATION_DATE in exif:
+            creation_date_str = exif[_EXIF.CREATION_DATE]
+            try:
+                return datetime.strptime(creation_date_str,
                                          '%Y:%m:%d %H:%M:%S')
-    except ValueError:
+            except ValueError:
+                logger.error('Error parsing creation date "{}" of image {}'
+                             .format(creation_date_str, path), exc_info=True)
         return None
     return None
 
