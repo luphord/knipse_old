@@ -2,6 +2,7 @@
 
 from pathlib import Path
 from datetime import datetime
+import logging
 from typing import List, Callable, Optional, Iterable, Tuple  # noqa: 401
 
 import click
@@ -9,6 +10,9 @@ from PIL import Image
 
 from .image import descriptor_from_image
 from .util import get_modification_time
+
+
+logger = logging.getLogger(__name__)
 
 
 _files_to_folders_heuristic = 0.1
@@ -57,8 +61,11 @@ def walk_images(base_folder: Path,
                     continue
                 mtime = get_modification_time(file_path)
                 if not filter or filter(base_folder, file_path, mtime):
+                    logger.debug('Walk unfiltered image {}'.format(file_path))
                     img = Image.open(file_path)
                     yield file_path, img, progress
+                else:
+                    logger.debug('Filtered out image {}'.format(file_path))
             except IOError:
                 pass  # not an image
             except ValueError:
