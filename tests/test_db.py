@@ -68,7 +68,7 @@ class TestKnipseDatabase(unittest.TestCase):
         '''Store an invalid image row with a null modification date
            and test that an error is raised on retrieval.
         '''
-        data = ('/', None, None, b'0' * 16, b'0' * 16)
+        data = ('/', None, None, b'0' * 16, b'0' * 16, 1)
         with self.db.db as conn:
             conn.execute(_INSERT_IMAGE, data)
         with self.assertRaises(AssertionError):

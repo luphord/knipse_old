@@ -21,7 +21,7 @@ _CREATE_IMAGE_TABLE = \
 
 _INSERT_IMAGE = \
     '''INSERT INTO images VALUES (
-        ?, ?, ?, ?, ?, 1
+        ?, ?, ?, ?, ?, ?
     );
     '''
 
@@ -33,7 +33,7 @@ _UPDATE_IMAGE = \
          modified_at = ?,
          md5 = ?,
          dhash = ?,
-         active = 1
+         active = ?
        WHERE rowid=?;
     '''
 
@@ -78,7 +78,8 @@ class KnipseDB:
                 created_at,
                 modified_at,
                 descriptor.md5,
-                descriptor.dhash
+                descriptor.dhash,
+                int(descriptor.active)
             )
             if descriptor.image_id is None:
                 conn.execute(_INSERT_IMAGE, data)
