@@ -155,7 +155,7 @@ class ImageRecognizer:
         known_images = list(known_images)
         # path (relative to source) are unique,
         # we can rely on the file system for that
-        self.known_files = {str(descr.path): descr.modified_at
+        self.known_files = {str(descr.path): descr
                             for descr in known_images}
         # md5 entries may not be unique in the database,
         # but if two images share the same md5 hash they are
@@ -180,9 +180,9 @@ class ImageRecognizer:
         '''
         rel_path = str(path.relative_to(source))
         return rel_path not in self.known_files \
-            or self.known_files[rel_path] != mtime
+            or self.known_files[rel_path].modified_at != mtime
 
-    def by_path(self, source: Path, path: Path) -> Optional[datetime]:
+    def by_path(self, source: Path, path: Path) -> Optional[ImageDescriptor]:
         '''Lookup images by path.'''
         rel_path = str(path.relative_to(source))
         return self.known_files.get(rel_path)
