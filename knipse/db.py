@@ -21,7 +21,7 @@ _CREATE_IMAGE_TABLE = \
 
 _INSERT_IMAGE = \
     '''INSERT INTO images VALUES (
-        ?, ?, ?, ?, ?, TRUE
+        ?, ?, ?, ?, ?, 1
     );
     '''
 
@@ -33,7 +33,7 @@ _UPDATE_IMAGE = \
          modified_at = ?,
          md5 = ?,
          dhash = ?,
-         active = TRUE
+         active = 1
        WHERE rowid=?;
     '''
 
@@ -47,7 +47,7 @@ _GET_IMAGES = \
          dhash
        FROM images
        WHERE
-         active = TRUE;'''
+         active = 1;'''
 
 _DT_FMT = '''%Y-%m-%d %H:%M:%S.%f'''
 
