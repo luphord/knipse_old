@@ -175,6 +175,19 @@ class TestKnipseDatabase(unittest.TestCase):
         for file_path, progress in scan_images(self.db, self.src):
             raise Exception('should not happen')
 
+    def test_scan_and_scan_subfolder_again(self) -> None:
+        '''Scan a folder structure to store images,
+           then scan a subfolder of it again and test if
+           all contained images are known. This essentially
+           simulates moving of the subfolder to the top of
+           the source folder structure.'''
+        cnt = 0
+        for file_path, progress in scan_images(self.db, self.src):
+            cnt += 1
+        self.assertEqual(len(EXPECTED_IMAGES), cnt)
+        for file_path, progress in scan_images(self.db, self.src / 'folder2'):
+            raise Exception('images in subfolder not recognized')
+
     def test_removal_of_duplicate_dhashes_in_index(self) -> None:
         '''Create and ImageRecognizer with duplicate dhashes
            and test if they are removed from index.'''

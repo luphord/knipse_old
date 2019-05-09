@@ -18,13 +18,22 @@ def scan_images(db: KnipseDB, base_folder: Path) \
     '''
     recgn = db.get_recognizer()
     for file_path, img, progress in walk_images(base_folder, recgn.filter):
+        # at this point we know that either the file path is not known
+        # or the modification date has changed
+        # ToDo: check if file is still there
         try:
             img.load()
         except (IOError, AttributeError):
             continue  # image type is not supported => we ignore it
         descr = descriptor_from_image(base_folder, file_path, img)
-        db.store(descr)
-        yield file_path, progress
+        # next we check if we can find an indentical file in the md5 index
+        looked_up_by_md5 = recgn.by_md5(descr.md5)
+        if looked_up_by_md5:  # image was moved
+            descr.image_id = looked_up_by_md5.image_id
+            db.store(descr)
+        else:  # new image
+            db.store(descr)
+            yield file_path, progress
 
 
 def _format_timedelta(dt):
