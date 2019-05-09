@@ -5,7 +5,7 @@ from pathlib import Path
 from datetime import datetime
 import re
 
-from knipse.db import KnipseDB, _INSERT_IMAGE, _DT_FMT
+from knipse.db import KnipseDB, ImageRecognizer, _INSERT_IMAGE, _DT_FMT
 from knipse.descriptor import ImageDescriptor
 from knipse.image import descriptor_from_image
 from knipse.walk import walk_images
@@ -166,7 +166,7 @@ class TestKnipseDatabase(unittest.TestCase):
                 raise Exception('should not happen')
 
     def test_scan_and_scan_again(self) -> None:
-        '''Scan a folder sctructure to store images,
+        '''Scan a folder structure to store images,
            then scan again and test if they are all known.'''
         cnt = 0
         for file_path, progress in scan_images(self.db, self.src):
@@ -174,3 +174,14 @@ class TestKnipseDatabase(unittest.TestCase):
         self.assertEqual(len(EXPECTED_IMAGES), cnt)
         for file_path, progress in scan_images(self.db, self.src):
             raise Exception('should not happen')
+
+    def test_removal_of_duplicate_dhashes_in_index(self) -> None:
+        '''Create and ImageRecognizer with duplicate dhashes
+           and test if they are removed from index.'''
+        recgn = ImageRecognizer([self.example_descriptor] * 2)
+        # same path -> coerced into one file in path index
+        self.assertEqual(1, len(recgn.known_files))
+        # same md5 -> coerced into one file in md5 index
+        self.assertEqual(1, len(recgn.index_md5))
+        # same dhash -> removed from index
+        self.assertEqual(0, len(recgn.index_dhash))
