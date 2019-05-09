@@ -3,6 +3,7 @@
 import sqlite3
 from datetime import datetime
 from pathlib import Path
+from collections import Counter
 from typing import Optional, Iterable
 
 from .descriptor import ImageDescriptor
@@ -163,10 +164,14 @@ class ImageRecognizer:
         self.index_md5 = {descr.md5: descr
                           for descr in known_images}
         # perceptual image hashes are not unique in the database
-        # and cannot be relied on for lookup in collision
-        # ToDo: filter duplicates before building index
+        # and cannot be relied on for lookup on collision
+        dhashes = (descr.dhash for descr in known_images)
+        duplicate_hashes = set(dhash for dhash, n in
+                               Counter(dhashes).items()
+                               if n > 1)
         self.index_dhash = {descr.dhash: descr
-                            for descr in known_images}
+                            for descr in known_images
+                            if descr.dhash not in duplicate_hashes}
 
     def filter(self, source, path, mtime):
         '''Filter images by path and modification date.
