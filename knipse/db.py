@@ -173,7 +173,7 @@ class ImageRecognizer:
                             for descr in known_images
                             if descr.dhash not in duplicate_hashes}
 
-    def filter(self, source, path, mtime):
+    def filter(self, source: Path, path: Path, mtime: datetime) -> bool:
         '''Filter images by path and modification date.
            Returns `True` if the image is new or modified,
            `False` if the image is already known.
@@ -182,7 +182,7 @@ class ImageRecognizer:
         return rel_path not in self.known_files \
             or self.known_files[rel_path] != mtime
 
-    def by_path(self, source: Path, path: Path):
+    def by_path(self, source: Path, path: Path) -> Optional[datetime]:
         '''Lookup images by path.'''
         rel_path = str(path.relative_to(source))
         return self.known_files.get(rel_path)
