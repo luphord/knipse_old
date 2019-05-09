@@ -31,7 +31,8 @@ class TestImageDescriptor(unittest.TestCase):
                     datetime(2010, 1, 7, 14, 47, 51),
                     datetime(2019, 3, 24, 13, 20, 50, 302073),
                     b'\x93\r\x1d\xb0z\x192\xcc\x96b\xea\xb3>\xef\xd4\xb9',
-                    b'\xef\xe7\x8e\x7f>???\x07\x03\x00\xffs\xff\xff\xe0')
+                    b'\xef\xe7\x8e\x7f>???\x07\x03\x00\xffs\xff\xff\xe0',
+                    True)
         actual = descriptor_from_image(self.src, self.path,
                                        Image.open(self.path))
         self.assertEqual(expected.path, actual.path)
@@ -48,7 +49,8 @@ class TestImageDescriptor(unittest.TestCase):
                     datetime(2019, 3, 22, 12, 33, 6, 589350),
                     b'\x1d@@L\x99_n\x88L)\xb1\xe4\xef\xe1\xca\x15',
                     b'\xf1\xf8\xf8\xf1\xfc\xfc\xf4\xf5\x08\xf1\xec' +
-                    b'\x00\x19\xff\xfe\xfc')
+                    b'\x00\x19\xff\xfe\xfc',
+                    True)
         actual = descriptor_from_image(self.src, self.path2,
                                        Image.open(self.path2))
         self.assertEqual(expected.path, actual.path)

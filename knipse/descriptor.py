@@ -17,13 +17,15 @@ class ImageDescriptor:
                  created_at: Optional[datetime],
                  modified_at: datetime,
                  md5: bytes,
-                 dhash: bytes) -> None:
+                 dhash: bytes,
+                 active: bool) -> None:
         self.image_id = image_id
         self.path = Path(path)
         self.created_at = created_at
         self.modified_at = modified_at
         self.md5 = md5
         self.dhash = dhash
+        self.active = active
 
     def _fields_iter(self):
         yield 'image_id', self.image_id
@@ -32,6 +34,7 @@ class ImageDescriptor:
         yield 'modified_at', self.modified_at
         yield 'md5', self.md5
         yield 'dhash', self.dhash
+        yield 'active', self.active
 
     def __eq__(self, other):
         if not isinstance(other, ImageDescriptor):

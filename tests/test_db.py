@@ -36,7 +36,8 @@ class TestKnipseDatabase(unittest.TestCase):
                 datetime(2019, 1, 1, 11, 11, 11),
                 b'\x1d@@L\x99_n\x88L)\xb1\xe4\xef\xe1\xca\x15',
                 b'\xf1\xf8\xf8\xf1\xfc\xfc\xf4\xf5\x08\xf1\xec' +
-                b'\x00\x19\xff\xfe\xfc')
+                b'\x00\x19\xff\xfe\xfc',
+                True)
 
     def test_table_creation(self) -> None:
         '''Check if database tables have been created.'''
@@ -81,44 +82,45 @@ class TestKnipseDatabase(unittest.TestCase):
         dt = datetime.strftime(self.example_descriptor.modified_at, _DT_FMT)
         img_id = re.compile('.*image id.*', re.IGNORECASE)
         with self.assertRaisesRegex(AssertionError, img_id):
-            row = (None, '/', None, dt, b'0'*16, b'0'*16)  # type: tuple
+            row = (None, '/', None, dt, b'0'*16, b'0'*16, 1)  # type: tuple
             self.db.descriptor_from_row(row)
         path = re.compile('.*path.*', re.IGNORECASE)
         with self.assertRaisesRegex(AssertionError, path):
-            row = (0, None, None, dt, b'0'*16, b'0'*16)
+            row = (0, None, None, dt, b'0'*16, b'0'*16, 1)
             self.db.descriptor_from_row(row)
         with self.assertRaisesRegex(AssertionError, path):
-            row = (0, 123, None, dt, b'0'*16, b'0'*16)
+            row = (0, 123, None, dt, b'0'*16, b'0'*16, 1)
             self.db.descriptor_from_row(row)
         mod_date = re.compile('.*modification date.*', re.IGNORECASE)
         with self.assertRaisesRegex(AssertionError, mod_date):
-            self.db.descriptor_from_row((0, '/', None, None, b'0'*16, b'0'*16))
+            row = (0, '/', None, None, b'0'*16, b'0'*16, 1)
+            self.db.descriptor_from_row(row)
         bad_format = re.compile('.*not match format.*', re.IGNORECASE)
         with self.assertRaisesRegex(ValueError, bad_format):
-            row = (0, '/', None, 'bad date', b'0'*16, b'0'*16)
+            row = (0, '/', None, 'bad date', b'0'*16, b'0'*16, 1)
             self.db.descriptor_from_row(row)
         with self.assertRaisesRegex(ValueError, bad_format):
-            row = (0, '/', 'bad date', dt, b'0'*16, b'0'*16)
+            row = (0, '/', 'bad date', dt, b'0'*16, b'0'*16, 1)
             self.db.descriptor_from_row(row)
         md5 = re.compile('.*md5.*', re.IGNORECASE)
         with self.assertRaisesRegex(AssertionError, md5):
-            row = (0, '/', None, dt, None, b'0'*16)
+            row = (0, '/', None, dt, None, b'0'*16, 1)
             self.db.descriptor_from_row(row)
         with self.assertRaisesRegex(AssertionError, md5):
-            row = (0, '/', None, dt, 'bad type', b'0'*16)
+            row = (0, '/', None, dt, 'bad type', b'0'*16, 1)
             self.db.descriptor_from_row(row)
         with self.assertRaisesRegex(AssertionError, md5):
-            row = (0, '/', None, dt, b'bad length', b'0'*16)
+            row = (0, '/', None, dt, b'bad length', b'0'*16, 1)
             self.db.descriptor_from_row(row)
         dhash = re.compile('.*perceptual hash.*', re.IGNORECASE)
         with self.assertRaisesRegex(AssertionError, dhash):
-            row = (0, '/', None, dt, b'0'*16, None)
+            row = (0, '/', None, dt, b'0'*16, None, 1)
             self.db.descriptor_from_row(row)
         with self.assertRaisesRegex(AssertionError, dhash):
-            row = (0, '/', None, dt, b'0'*16, 'bad type')
+            row = (0, '/', None, dt, b'0'*16, 'bad type', 1)
             self.db.descriptor_from_row(row)
         with self.assertRaisesRegex(AssertionError, dhash):
-            row = (0, '/', None, dt, b'0'*16, b'bad length')
+            row = (0, '/', None, dt, b'0'*16, b'bad length', 1)
             self.db.descriptor_from_row(row)
 
     def test_storing_and_updating(self) -> None:

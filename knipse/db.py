@@ -44,7 +44,8 @@ _GET_IMAGES = \
          created_at,
          modified_at,
          md5,
-         dhash
+         dhash,
+         active
        FROM images
        WHERE
          active = 1;'''
@@ -86,8 +87,9 @@ class KnipseDB:
 
     def descriptor_from_row(self, row: tuple) -> ImageDescriptor:
         '''Parse, check and convert a database row to an `ImageDescriptor`.'''
-        assert len(row) == 6, 'Row length must be 6, got {}'.format(len(row))
-        image_id, path_str, created_at_str, modified_at_str, md5, dhash = row
+        assert len(row) == 7, 'Row length must be 7, got {}'.format(len(row))
+        (image_id, path_str, created_at_str,
+         modified_at_str, md5, dhash, active_int) = row
         assert isinstance(image_id, int), \
             'Image ID must be of type int, got {} of type {}' \
             .format(image_id, type(image_id))
@@ -116,13 +118,20 @@ class KnipseDB:
             .format(dhash, type(dhash))
         assert len(dhash) == 16, \
             'perceptual hash must be of length 16, got {}'.format(len(dhash))
+        assert isinstance(active_int, int), \
+            'active flag must be of type int, got {} of type {}' \
+            .format(active_int, type(active_int))
+        assert active_int in (0, 1), \
+            'active flag must be of 0 or 1, got {}'.format(active_int)
+        active = bool(active_int)
         return ImageDescriptor(
                     image_id,
                     Path(path),
                     created_at,
                     modified_at,
                     md5,
-                    dhash
+                    dhash,
+                    active
                 )
 
     def list_images(self) -> Iterable[ImageDescriptor]:

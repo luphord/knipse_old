@@ -67,4 +67,5 @@ def descriptor_from_image(source: Path,
                            created_at,
                            modified_at,
                            md5,
-                           dhsh)
+                           dhsh,
+                           True)
