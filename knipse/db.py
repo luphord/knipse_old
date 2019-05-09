@@ -152,10 +152,19 @@ class ImageRecognizer:
 
     def __init__(self, known_images: Iterable[ImageDescriptor]) -> None:
         known_images = list(known_images)
+        # path (relative to source) are unique,
+        # we can rely on the file system for that
         self.known_files = {str(descr.path): descr.modified_at
                             for descr in known_images}
+        # md5 entries may not be unique in the database,
+        # but if two images share the same md5 hash they are
+        # equal on the byte level and hence it does not matter
+        # to which one we refer
         self.index_md5 = {descr.md5: descr
                           for descr in known_images}
+        # perceptual image hashes are not unique in the database
+        # and cannot be relied on for lookup in collision
+        # ToDo: filter duplicates before building index
         self.index_dhash = {descr.dhash: descr
                             for descr in known_images}
 
