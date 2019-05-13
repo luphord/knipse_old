@@ -31,7 +31,8 @@ class TestImageWalking(unittest.TestCase):
 
     def test_walking(self) -> None:
         '''Test walking images within a folder structure'''
-        for file_path, img, progress in walk_images(self.src):
+        for file_path, img, progress \
+                in walk_images(self.src, skip_thumbnail_folders=True):
             p = str(file_path.relative_to(self.src))
             self.assertIn(p, self.expected_images)
             self.expected_images.remove(p)

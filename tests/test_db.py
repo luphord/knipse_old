@@ -18,7 +18,8 @@ def store_images(db, base_folder: Path) -> None:
     '''Load descriptors for all images in `base_folder`,
        then store them in database.
     '''
-    for file_path, img, progress in walk_images(base_folder):
+    for file_path, img, progress \
+            in walk_images(base_folder, skip_thumbnail_folders=True):
         descr = descriptor_from_image(base_folder, file_path, img)
         db.store(descr)
 
@@ -146,7 +147,8 @@ class TestKnipseDatabase(unittest.TestCase):
            walk again and test they are all known.'''
         store_images(self.db, self.src)
         filter = self.db.get_recognizer().filter
-        for file_path, img, progress in walk_images(self.src, filter):
+        for file_path, img, progress \
+                in walk_images(self.src, filter, skip_thumbnail_folders=True):
             raise Exception('should not happen')
 
     def test_recognizing_images_by_various_attributes(self) -> None:
@@ -154,7 +156,8 @@ class TestKnipseDatabase(unittest.TestCase):
            again and test if they are known by various attributes.'''
         store_images(self.db, self.src)
         recognizer = self.db.get_recognizer()
-        for file_path, img, progress in walk_images(self.src, None):
+        for file_path, img, progress \
+                in walk_images(self.src, None, skip_thumbnail_folders=True):
             descr = descriptor_from_image(self.src, file_path, img)
             if not recognizer.by_md5(descr.md5):
                 raise Exception('should not happen')
@@ -169,10 +172,12 @@ class TestKnipseDatabase(unittest.TestCase):
         '''Scan a folder structure to store images,
            then scan again and test if they are all known.'''
         cnt = 0
-        for file_path, progress in scan_images(self.db, self.src):
+        for file_path, progress in scan_images(self.db, self.src,
+                                               skip_thumbnail_folders=True):
             cnt += 1
         self.assertEqual(len(EXPECTED_IMAGES), cnt)
-        for file_path, progress in scan_images(self.db, self.src):
+        for file_path, progress in scan_images(self.db, self.src,
+                                               skip_thumbnail_folders=True):
             raise Exception('should not happen')
 
     def test_scan_and_scan_subfolder_again(self) -> None:
@@ -182,10 +187,12 @@ class TestKnipseDatabase(unittest.TestCase):
            simulates moving of the subfolder to the top of
            the source folder structure.'''
         cnt = 0
-        for file_path, progress in scan_images(self.db, self.src):
+        for file_path, progress in scan_images(self.db, self.src,
+                                               skip_thumbnail_folders=True):
             cnt += 1
         self.assertEqual(len(EXPECTED_IMAGES), cnt)
-        for file_path, progress in scan_images(self.db, self.src / 'folder2'):
+        for file_path, progress in scan_images(self.db, self.src / 'folder2',
+                                               skip_thumbnail_folders=True):
             raise Exception('images in subfolder not recognized')
 
     def test_removal_of_duplicate_dhashes_in_index(self) -> None:

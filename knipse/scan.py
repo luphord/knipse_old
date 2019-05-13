@@ -11,13 +11,16 @@ from .walk import walk_images
 from .image import descriptor_from_image
 
 
-def scan_images(db: KnipseDB, base_folder: Path) \
+def scan_images(db: KnipseDB, base_folder: Path,
+                skip_thumbnail_folders: bool=True) \
         -> Iterable[Tuple[Path, float]]:
     '''Walk all folders below `base_folder`
        and store contained images in database
     '''
     recgn = db.get_recognizer()
-    for file_path, img, progress in walk_images(base_folder, recgn.filter):
+    for file_path, img, progress in walk_images(base_folder,
+                                                recgn.filter,
+                                                skip_thumbnail_folders):
         # at this point we know that either the file path is not known
         # or the modification date has changed
         # ToDo: check if file is still there
