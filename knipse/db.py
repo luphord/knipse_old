@@ -43,6 +43,18 @@ _INSERT_IMAGE = \
     );
     '''
 
+_INSERT_LIST = \
+    '''INSERT INTO lists VALUES (
+        ?, ?
+    );
+    '''
+
+_INSERT_LIST_ENTRY = \
+    '''INSERT INTO list_entries VALUES (
+        ?, ?, ?
+    );
+    '''
+
 _UPDATE_IMAGE = \
     '''UPDATE images
        SET
@@ -67,6 +79,21 @@ _GET_IMAGES = \
        FROM images
        WHERE
          active = 1;'''
+
+_GET_IMAGES_IN_LIST = \
+    '''SELECT
+         rowid,
+         path,
+         created_at,
+         modified_at,
+         md5,
+         dhash,
+         active
+       FROM images, list_entries
+       WHERE
+         active = 1
+         AND images.row_id = list_entries.image_id
+         AND images.list_id = ?;'''
 
 _DT_FMT = '''%Y-%m-%d %H:%M:%S.%f'''
 
@@ -105,6 +132,15 @@ class KnipseDB:
                 conn.execute(_INSERT_IMAGE, data)
             else:
                 conn.execute(_UPDATE_IMAGE, (*data, descriptor.image_id))
+
+    def store_list(self, name: str, virtual_folder: str,
+                   images: Iterable[ImageDescriptor]):
+        with self.db as conn:
+            conn.execute(_INSERT_LIST_ENTRY, name, virtual_folder)
+            # todos
+            # - get list id
+            # - insert images for list_id
+            # - replace name/virtual_folder by ListDescriptor
 
     def descriptor_from_row(self, row: tuple) -> ImageDescriptor:
         '''Parse, check and convert a database row to an `ImageDescriptor`.'''
@@ -155,10 +191,13 @@ class KnipseDB:
                     active
                 )
 
-    def list_images(self) -> Iterable[ImageDescriptor]:
+    def list_images(self, list_id: Optional[int] = None) \
+            -> Iterable[ImageDescriptor]:
         '''Get images contained in database as `ImageDescriptor` instances.'''
         with self.db as conn:
-            for row in conn.execute(_GET_IMAGES):
+            cursor = conn.execute(_GET_IMAGES) if list_id is None \
+                else conn.execute(_GET_IMAGES_IN_LIST, list_id)
+            for row in cursor:
                 yield self.descriptor_from_row(row)
 
     def get_recognizer(self) -> 'ImageRecognizer':
