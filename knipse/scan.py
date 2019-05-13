@@ -58,8 +58,11 @@ def _format_timedelta(dt):
 
 
 @click.command(name='scan')
+@click.option('-t', '--skip-thumbnails/--no-skip-thumbnails', default=True,
+              show_default=True,
+              help='Skips all folders containing the word "thumbnail".')
 @click.pass_context
-def cli_scan(ctx):
+def cli_scan(ctx, skip_thumbnails):
     '''Walk all folders below `base_folder`
        and store contained images in database
     '''
@@ -68,7 +71,7 @@ def cli_scan(ctx):
     click.echo('Scanning images in {}...'.format(base_folder))
     start = datetime.now()
     line_length = 1
-    for file_path, progress in scan_images(db, base_folder):
+    for file_path, progress in scan_images(db, base_folder, skip_thumbnails):
         rel_path = file_path.relative_to(base_folder)
         remaining = (datetime.now() - start) * (1 - progress)
         click.echo('\r' + ' ' * line_length, nl=False)
