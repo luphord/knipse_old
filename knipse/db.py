@@ -20,6 +20,23 @@ _CREATE_IMAGE_TABLE = \
     );
     '''
 
+_CREATE_LISTS_TABLE = \
+    '''CREATE TABLE IF NOT EXISTS lists (
+        name text,
+        virtual_folder text
+    );
+    '''
+
+_CREATE_LIST_ENTRIES_TABLE = \
+    '''CREATE TABLE IF NOT EXISTS list_entries (
+        list_id int,
+        image_id int,
+        position real,
+        FOREIGN KEY (list_id) REFERENCES lists,
+        FOREIGN KEY (image_id) REFERENCES images
+    );
+    '''
+
 _INSERT_IMAGE = \
     '''INSERT INTO images VALUES (
         ?, ?, ?, ?, ?, ?
@@ -64,6 +81,8 @@ class KnipseDB:
     def _setup_db(self):
         with self.db as conn:
             conn.execute(_CREATE_IMAGE_TABLE)
+            conn.execute(_CREATE_LISTS_TABLE)
+            conn.execute(_CREATE_LIST_ENTRIES_TABLE)
 
     def store(self, descriptor: ImageDescriptor) -> None:
         '''Store `descriptor` in the database. If `descriptor` contains
