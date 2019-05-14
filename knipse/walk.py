@@ -5,10 +5,8 @@ from datetime import datetime
 import logging
 from typing import List, Callable, Optional, Iterable, Tuple  # noqa: 401
 
-import click
 from PIL import Image
 
-from .image import descriptor_from_image
 from .util import get_modification_time
 
 
@@ -83,14 +81,3 @@ def walk_images(base_folder: Path,
                             for i, folder in enumerate(sub_folders)]
             folder_progr.reverse()  # by popping the list we walk backwards
             folder_tree.append(folder_progr)
-
-
-@click.command(name='walk')
-@click.argument('base_folder',
-                type=click.Path(exists=True, file_okay=False, dir_okay=True,
-                                resolve_path=True), default='.')
-def cli_walk(base_folder):
-    '''Recursively list all images below `base_folder`'''
-    for file_path, img, progress in walk_images(base_folder):
-        descr = descriptor_from_image(base_folder, file_path, img)
-        click.echo('{:.1f}%\t{}'.format(progress * 100, descr))

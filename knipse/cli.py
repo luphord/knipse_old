@@ -8,7 +8,6 @@ import logging.config
 
 from .db import KnipseDB
 from .dhash import cli_dhash
-from .walk import cli_walk
 from .scan import cli_scan
 from .symlink import cli_symlink
 from .gui import cli_display
@@ -69,21 +68,10 @@ def cli_knipse(ctx, database, source, verbose):
     return 0
 
 
-@click.command(name='list')
-@click.pass_context
-def cli_list(ctx):
-    '''List all images contained in database'''
-    db = ctx.obj['database']
-    for descr in db.list_images():
-        click.echo(descr)
-
-
 cli_knipse.add_command(cli_dhash)
-cli_knipse.add_command(cli_walk)
 cli_knipse.add_command(cli_scan)
 cli_knipse.add_command(cli_symlink)
 cli_knipse.add_command(cli_display)
-cli_knipse.add_command(cli_list)
 cli_knipse.add_command(cli_show)
 
 
