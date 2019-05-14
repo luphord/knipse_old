@@ -52,3 +52,40 @@ class ImageDescriptor:
                                      if isinstance(value, bytes)
                                      else value)
                          for _, value in self._fields_iter())
+
+
+class ListDescriptor:
+    '''Container for list metadata like name and virtual folder.
+       In-memory representation of individual rows of the list
+       database table.
+    '''
+
+    def __init__(self,
+                 list_id: Optional[int],
+                 name: str,
+                 virtual_folder: Path) -> None:
+        self.list_id = list_id
+        self.name = name
+        self.virtual_folder = Path(virtual_folder)
+
+    def _fields_iter(self):
+        yield 'list_id', self.list_id
+        yield 'name', self.name
+        yield 'virtual_folder', self.virtual_folder
+
+    def __eq__(self, other):
+        if not isinstance(other, ListDescriptor):
+            return False
+        return all(a == b
+                   for a, b in zip(self._fields_iter(), other._fields_iter()))
+
+    def __repr__(self) -> str:
+        fields = ', '.join('{}={!r}'.format(key, value)
+                           for key, value in self._fields_iter())
+        return 'List({})'.format(fields)
+
+    def __str__(self) -> str:
+        return '\t'.join('{}'.format(value.hex()
+                                     if isinstance(value, bytes)
+                                     else value)
+                         for _, value in self._fields_iter())
