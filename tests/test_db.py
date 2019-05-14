@@ -48,6 +48,8 @@ class TestKnipseDatabase(unittest.TestCase):
                      for row in conn.execute('SELECT * from sqlite_master;')
                      if row[0] == 'table'])
         self.assertIn('images', tables)
+        self.assertIn('lists', tables)
+        self.assertIn('list_entries', tables)
 
     def test_storing_image_descriptors(self) -> None:
         '''Store images in database and check their count.'''
