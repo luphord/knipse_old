@@ -119,7 +119,7 @@ class KnipseDB:
             conn.execute(_CREATE_LISTS_TABLE)
             conn.execute(_CREATE_LIST_ENTRIES_TABLE)
 
-    def store(self, descriptor: ImageDescriptor) -> None:
+    def store(self, descriptor: ImageDescriptor) -> ImageDescriptor:
         '''Store `descriptor` in the database. If `descriptor` contains
            an `image_id`, the corresponding row in the database is updated.
         '''
@@ -137,21 +137,24 @@ class KnipseDB:
                 int(descriptor.active)
             )
             if descriptor.image_id is None:
-                conn.execute(_INSERT_IMAGE, data)
+                cursor = conn.execute(_INSERT_IMAGE, data)
             else:
-                conn.execute(_UPDATE_IMAGE, (*data, descriptor.image_id))
+                cursor = conn.execute(_UPDATE_IMAGE,
+                                      (*data, descriptor.image_id))
+            return descriptor.with_id(cursor.lastrowid)
 
     def store_list(self, lst: ListDescriptor,
-                   images: Iterable[ImageDescriptor]):
+                   images: Iterable[ImageDescriptor]) -> ListDescriptor:
         with self.db as conn:
             data = (lst.name, str(lst.virtual_folder))
             if lst.list_id is None:
-                conn.execute(_INSERT_LIST, data)
+                cursor = conn.execute(_INSERT_LIST, data)
             else:
-                conn.execute(_UPDATE_LIST, (*data, lst.list_id))
+                cursor = conn.execute(_UPDATE_LIST, (*data, lst.list_id))
             # todos
             # - get list id
             # - insert images for list_id
+            return lst.with_id(cursor.lastrowid)
 
     def descriptor_from_row(self, row: tuple) -> ImageDescriptor:
         '''Parse, check and convert a database row to an `ImageDescriptor`.'''

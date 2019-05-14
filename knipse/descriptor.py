@@ -27,6 +27,16 @@ class ImageDescriptor:
         self.dhash = dhash
         self.active = active
 
+    def with_id(self, image_id: int) -> 'ImageDescriptor':
+        '''Create a copy of this descriptor with the given `image_id`.'''
+        return ImageDescriptor(image_id,
+                               self.path,
+                               self.created_at,
+                               self.modified_at,
+                               self.md5,
+                               self.dhash,
+                               self.active)
+
     def _fields_iter(self):
         yield 'image_id', self.image_id
         yield 'path', self.path
@@ -67,6 +77,12 @@ class ListDescriptor:
         self.list_id = list_id
         self.name = name
         self.virtual_folder = Path(virtual_folder)
+
+    def with_id(self, list_id: int) -> 'ListDescriptor':
+        '''Create a copy of this descriptor with the given `list_id`.'''
+        return ListDescriptor(list_id,
+                              self.name,
+                              self.virtual_folder)
 
     def _fields_iter(self):
         yield 'list_id', self.list_id
