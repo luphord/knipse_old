@@ -90,7 +90,7 @@ _GET_IMAGES = \
 
 _GET_IMAGES_IN_LIST = \
     '''SELECT
-         rowid,
+         images.rowid,
          path,
          created_at,
          modified_at,
@@ -101,7 +101,7 @@ _GET_IMAGES_IN_LIST = \
        WHERE
          active = 1
          AND images.rowid = list_entries.image_id
-         AND list.rowid = ?;'''
+         AND list_entries.list_id = ?;'''
 
 _DT_FMT = '''%Y-%m-%d %H:%M:%S.%f'''
 
