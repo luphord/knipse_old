@@ -63,7 +63,7 @@ def _format_timedelta(dt):
               help='Skips all folders containing the word "thumbnail".')
 @click.pass_context
 def cli_scan(ctx, skip_thumbnails):
-    '''Walk all folders below `base_folder`
+    '''Walk all folders below global knipse `source`
        and store contained images in database
     '''
     db = ctx.obj['database']
