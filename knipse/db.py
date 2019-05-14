@@ -151,10 +151,13 @@ class KnipseDB:
                 cursor = conn.execute(_INSERT_LIST, data)
             else:
                 cursor = conn.execute(_UPDATE_LIST, (*data, lst.list_id))
-            # todos
-            # - get list id
-            # - insert images for list_id
-            return lst.with_id(cursor.lastrowid)
+            list_id = cursor.lastrowid
+            for i, img in enumerate(images):
+                if img.image_id is None:
+                    img = self.store(img)
+                conn.execute(_INSERT_LIST_ENTRY,
+                             (lst.list_id, img.image_id, float(i)))
+            return lst.with_id(list_id)
 
     def descriptor_from_row(self, row: tuple) -> ImageDescriptor:
         '''Parse, check and convert a database row to an `ImageDescriptor`.'''
