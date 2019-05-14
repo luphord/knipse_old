@@ -6,7 +6,7 @@ from datetime import datetime
 import re
 
 from knipse.db import KnipseDB, ImageRecognizer, _INSERT_IMAGE, _DT_FMT
-from knipse.descriptor import ImageDescriptor
+from knipse.descriptor import ImageDescriptor, ListDescriptor
 from knipse.image import descriptor_from_image
 from knipse.walk import walk_images
 from knipse.scan import scan_images
@@ -39,6 +39,9 @@ class TestKnipseDatabase(unittest.TestCase):
                 b'\xf1\xf8\xf8\xf1\xfc\xfc\xf4\xf5\x08\xf1\xec' +
                 b'\x00\x19\xff\xfe\xfc',
                 True)
+        self.example_list = ListDescriptor(None,
+                                           'My Test List',
+                                           Path('data/test/1'))
 
     def test_table_creation(self) -> None:
         '''Check if database tables have been created.'''
@@ -207,3 +210,10 @@ class TestKnipseDatabase(unittest.TestCase):
         self.assertEqual(1, len(recgn.index_md5))
         # same dhash -> removed from index
         self.assertEqual(0, len(recgn.index_dhash))
+
+    def test_storing_list_descriptors(self) -> None:
+        '''Store list in database and check the table count.'''
+        self.db.store_list(self.example_list, [])
+        with self.db.db as conn:
+            cnt = conn.execute('SELECT count(*) FROM lists;').fetchone()[0]
+            self.assertEqual(1, cnt)

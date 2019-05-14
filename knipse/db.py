@@ -6,7 +6,7 @@ from pathlib import Path
 from collections import Counter
 from typing import Optional, Iterable
 
-from .descriptor import ImageDescriptor
+from .descriptor import ImageDescriptor, ListDescriptor
 
 
 _CREATE_IMAGE_TABLE = \
@@ -64,7 +64,15 @@ _UPDATE_IMAGE = \
          md5 = ?,
          dhash = ?,
          active = ?
-       WHERE rowid=?;
+       WHERE rowid = ?;
+    '''
+
+_UPDATE_LIST = \
+    '''UPDATE lists
+       SET
+         name = ?,
+         virtual_path = ?
+       WHERE rowid = ?;
     '''
 
 _GET_IMAGES = \
@@ -92,8 +100,8 @@ _GET_IMAGES_IN_LIST = \
        FROM images, list_entries
        WHERE
          active = 1
-         AND images.row_id = list_entries.image_id
-         AND images.list_id = ?;'''
+         AND images.rowid = list_entries.image_id
+         AND list.rowid = ?;'''
 
 _DT_FMT = '''%Y-%m-%d %H:%M:%S.%f'''
 
@@ -133,14 +141,17 @@ class KnipseDB:
             else:
                 conn.execute(_UPDATE_IMAGE, (*data, descriptor.image_id))
 
-    def store_list(self, name: str, virtual_folder: str,
+    def store_list(self, lst: ListDescriptor,
                    images: Iterable[ImageDescriptor]):
         with self.db as conn:
-            conn.execute(_INSERT_LIST_ENTRY, name, virtual_folder)
+            data = (lst.name, str(lst.virtual_folder))
+            if lst.list_id is None:
+                conn.execute(_INSERT_LIST, data)
+            else:
+                conn.execute(_UPDATE_LIST, (*data, lst.list_id))
             # todos
             # - get list id
             # - insert images for list_id
-            # - replace name/virtual_folder by ListDescriptor
 
     def descriptor_from_row(self, row: tuple) -> ImageDescriptor:
         '''Parse, check and convert a database row to an `ImageDescriptor`.'''
@@ -191,12 +202,12 @@ class KnipseDB:
                     active
                 )
 
-    def list_images(self, list_id: Optional[int] = None) \
+    def list_images(self, lst: Optional[ListDescriptor] = None) \
             -> Iterable[ImageDescriptor]:
         '''Get images contained in database as `ImageDescriptor` instances.'''
         with self.db as conn:
-            cursor = conn.execute(_GET_IMAGES) if list_id is None \
-                else conn.execute(_GET_IMAGES_IN_LIST, list_id)
+            cursor = conn.execute(_GET_IMAGES) if lst is None \
+                else conn.execute(_GET_IMAGES_IN_LIST, lst.list_id)
             for row in cursor:
                 yield self.descriptor_from_row(row)
 
