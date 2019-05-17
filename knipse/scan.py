@@ -12,7 +12,7 @@ from .image import descriptor_from_image
 
 
 def scan_images(db: KnipseDB, base_folder: Path,
-                skip_thumbnail_folders: bool=True) \
+                skip_thumbnail_folders: bool = True) \
         -> Iterable[Tuple[Path, float]]:
     '''Walk all folders below `base_folder`
        and store contained images in database

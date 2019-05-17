@@ -19,7 +19,7 @@ _files_to_folders_heuristic = 0.1
 def walk_images(base_folder: Path,
                 filter: Optional[Callable[[Path, Path, datetime], bool]]
                 = None,
-                skip_thumbnail_folders: bool=True) \
+                skip_thumbnail_folders: bool = True) \
         -> Iterable[Tuple[Path, Image.Image, float]]:
     '''Walk all folders below `base_folder` and yield contained images.
        The `filter` function can be used to skip images, it should return
