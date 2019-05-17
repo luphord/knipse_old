@@ -5,6 +5,7 @@ from datetime import datetime
 from pathlib import Path
 from collections import Counter
 from typing import Optional, Iterable
+import typing
 
 from .descriptor import ImageDescriptor, ListDescriptor
 
@@ -119,7 +120,28 @@ class KnipseDB:
             conn.execute(_CREATE_LISTS_TABLE)
             conn.execute(_CREATE_LIST_ENTRIES_TABLE)
 
-    def store(self, descriptor: ImageDescriptor) -> ImageDescriptor:
+    @typing.overload
+    def store(self, descriptor: ImageDescriptor) -> ImageDescriptor: ...
+
+    @typing.overload
+    def store(self, lst: ListDescriptor, images: Iterable[ImageDescriptor]) \
+        -> ListDescriptor: ...
+
+    def store(self, descriptor, content=None):
+        '''Store various `descriptor` types in the database.
+           If `descriptor` contains an ID, the corresponding row
+           is updated.
+        '''
+        if isinstance(descriptor, ImageDescriptor):
+            assert content is None, \
+                'Cannot store an ImageDescriptor with content'
+            return self._store_image(descriptor)
+        elif isinstance(descriptor, ListDescriptor):
+            return self._store_list(descriptor, content)
+        else:
+            raise NotImplementedError('Storing {}'.format(type(descriptor)))
+
+    def _store_image(self, descriptor: ImageDescriptor) -> ImageDescriptor:
         '''Store `descriptor` in the database. If `descriptor` contains
            an `image_id`, the corresponding row in the database is updated.
         '''
@@ -143,8 +165,8 @@ class KnipseDB:
                                       (*data, descriptor.image_id))
             return descriptor.with_id(cursor.lastrowid)
 
-    def store_list(self, lst: ListDescriptor,
-                   images: Iterable[ImageDescriptor]) -> ListDescriptor:
+    def _store_list(self, lst: ListDescriptor,
+                    images: Iterable[ImageDescriptor]) -> ListDescriptor:
         with self.db as conn:
             data = (lst.name, str(lst.virtual_folder))
             if lst.list_id is None:
