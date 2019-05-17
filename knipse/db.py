@@ -4,7 +4,7 @@ import sqlite3
 from datetime import datetime
 from pathlib import Path
 from collections import Counter
-from typing import Optional, Iterable
+from typing import Optional, Iterable, Union
 import typing
 
 from .descriptor import ImageDescriptor, ListDescriptor
@@ -124,10 +124,13 @@ class KnipseDB:
     def store(self, descriptor: ImageDescriptor) -> ImageDescriptor: ...
 
     @typing.overload
-    def store(self, lst: ListDescriptor, images: Iterable[ImageDescriptor]) \
+    def store(self, descriptor: ListDescriptor,
+              content: Iterable[ImageDescriptor]) \
         -> ListDescriptor: ...
 
-    def store(self, descriptor, content=None):
+    def store(self, descriptor: Union[ImageDescriptor, ListDescriptor],
+              content: Iterable[ImageDescriptor] = None) \
+            -> Union[ImageDescriptor, ListDescriptor]:
         '''Store various `descriptor` types in the database.
            If `descriptor` contains an ID, the corresponding row
            is updated.
@@ -137,6 +140,7 @@ class KnipseDB:
                 'Cannot store an ImageDescriptor with content'
             return self._store_image(descriptor)
         elif isinstance(descriptor, ListDescriptor):
+            content = content or []
             return self._store_list(descriptor, content)
         else:
             raise NotImplementedError('Storing {}'.format(type(descriptor)))
@@ -166,7 +170,8 @@ class KnipseDB:
             return descriptor.with_id(cursor.lastrowid)
 
     def _store_list(self, lst: ListDescriptor,
-                    images: Iterable[ImageDescriptor]) -> ListDescriptor:
+                    images: Iterable[ImageDescriptor]) \
+            -> ListDescriptor:
         with self.db as conn:
             data = (lst.name, str(lst.virtual_folder))
             if lst.list_id is None:
