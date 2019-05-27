@@ -95,3 +95,31 @@ class ListDescriptor(BaseDescriptor):
         yield 'list_id', self.list_id
         yield 'name', self.name
         yield 'virtual_folder', self.virtual_folder
+
+
+class ListEntryDescriptor(BaseDescriptor):
+    '''Container for list entry metadata. In-memory representation of
+       individual rows of the list entry database table.
+    '''
+
+    def __init__(self,
+                 list_entry_id: Optional[int],
+                 list_id: int,
+                 image_id: int,
+                 position: float) -> None:
+        self.list_entry_id = list_entry_id
+        self.list_id = list_id
+        self.image_id = image_id
+        self.position = position
+
+    def with_id(self, list_entry_id: int) -> 'ListEntryDescriptor':
+        '''Create a copy of this descriptor with the given `list_entry_id`.'''
+        return ListEntryDescriptor(list_entry_id,
+                                   self.list_id,
+                                   self.image_id,
+                                   self.position)
+
+    def _fields_iter(self):
+        yield 'list_entry_id', self.list_entry_id
+        yield 'list_id', self.list_id
+        yield 'image_id', self.image_id
