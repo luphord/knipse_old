@@ -74,3 +74,15 @@ class TestImageDescriptor(unittest.TestCase):
                 found = True
                 break
         self.assertTrue(found)
+
+    def test_descriptor_equality(self):
+        descr1 = descriptor_from_image(self.src, self.path2,
+                                       Image.open(self.path2))
+        descr2 = descriptor_from_image(self.src, self.path2,
+                                       Image.open(self.path2))
+        self.assertEqual(descr1, descr2)
+
+    def test_descriptor_repr(self):
+        descr = descriptor_from_image(self.src, self.path2,
+                                      Image.open(self.path2))
+        self.assertIn('ImageDescriptor(', repr(descr))

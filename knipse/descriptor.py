@@ -2,10 +2,34 @@
 
 from pathlib import Path
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Iterable, Tuple
 
 
-class ImageDescriptor:
+class BaseDescriptor:
+    '''(Abstract) Base class for descriptors.'''
+
+    def __eq__(self, other):
+        if not isinstance(other, type(self)):
+            return False
+        return all(a == b
+                   for a, b in zip(self._fields_iter(), other._fields_iter()))
+
+    def __repr__(self) -> str:
+        fields = ', '.join('{}={!r}'.format(key, value)
+                           for key, value in self._fields_iter())
+        return '{}({})'.format(type(self).__name__, fields)
+
+    def __str__(self) -> str:
+        return '\t'.join('{}'.format(value.hex()
+                                     if isinstance(value, bytes)
+                                     else value)
+                         for _, value in self._fields_iter())
+
+    def _fields_iter(self) -> Iterable[Tuple[str, object]]:
+        raise NotImplementedError('_fields_iter')
+
+
+class ImageDescriptor(BaseDescriptor):
     '''Container for image metadata like path or modification date.
        In-memory representation of individual rows of the main
        database table.
@@ -46,25 +70,8 @@ class ImageDescriptor:
         yield 'dhash', self.dhash
         yield 'active', self.active
 
-    def __eq__(self, other):
-        if not isinstance(other, ImageDescriptor):
-            return False
-        return all(a == b
-                   for a, b in zip(self._fields_iter(), other._fields_iter()))
 
-    def __repr__(self) -> str:
-        fields = ', '.join('{}={!r}'.format(key, value)
-                           for key, value in self._fields_iter())
-        return 'ImageDescriptor({})'.format(fields)
-
-    def __str__(self) -> str:
-        return '\t'.join('{}'.format(value.hex()
-                                     if isinstance(value, bytes)
-                                     else value)
-                         for _, value in self._fields_iter())
-
-
-class ListDescriptor:
+class ListDescriptor(BaseDescriptor):
     '''Container for list metadata like name and virtual folder.
        In-memory representation of individual rows of the list
        database table.
@@ -88,20 +95,3 @@ class ListDescriptor:
         yield 'list_id', self.list_id
         yield 'name', self.name
         yield 'virtual_folder', self.virtual_folder
-
-    def __eq__(self, other):
-        if not isinstance(other, ListDescriptor):
-            return False
-        return all(a == b
-                   for a, b in zip(self._fields_iter(), other._fields_iter()))
-
-    def __repr__(self) -> str:
-        fields = ', '.join('{}={!r}'.format(key, value)
-                           for key, value in self._fields_iter())
-        return 'List({})'.format(fields)
-
-    def __str__(self) -> str:
-        return '\t'.join('{}'.format(value.hex()
-                                     if isinstance(value, bytes)
-                                     else value)
-                         for _, value in self._fields_iter())
