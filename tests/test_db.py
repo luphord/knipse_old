@@ -67,7 +67,7 @@ class TestKnipseDatabase(unittest.TestCase):
            set to None (should be null in database).
         '''
         self.db.store(self.example_descriptor)
-        retrieved_descr = list(self.db.list_images())[0]
+        retrieved_descr = list(self.db.load_all_images())[0]
         retrieved_descr.image_id = None
         self.assertEqual(self.example_descriptor, retrieved_descr)
 
@@ -79,7 +79,7 @@ class TestKnipseDatabase(unittest.TestCase):
         with self.db.db as conn:
             conn.execute(_INSERT_IMAGE, data)
         with self.assertRaises(AssertionError):
-            list(self.db.list_images())
+            list(self.db.load_all_images())
 
     def test_invalid_row_conversion(self) -> None:
         '''Test proper errors for invalid database rows.'''
@@ -142,11 +142,11 @@ class TestKnipseDatabase(unittest.TestCase):
            and test if it was updated.
         '''
         self.db.store(self.example_descriptor)
-        retrieved_images = list(self.db.list_images())
+        retrieved_images = list(self.db.load_all_images())
         self.assertEqual(1, len(retrieved_images))
         retrieved_descr = retrieved_images[0]
         self.db.store(retrieved_descr)  # should only update, not insert
-        self.assertEqual(1, len(list(self.db.list_images())))
+        self.assertEqual(1, len(list(self.db.load_all_images())))
 
     def test_walking_known_images_in_db(self) -> None:
         '''Walk a folder structure, store all images, then

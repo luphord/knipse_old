@@ -263,17 +263,23 @@ class KnipseDB:
                     active
                 )
 
-    def list_images(self, lst: Optional[ListDescriptor] = None) \
-            -> Iterable[ImageDescriptor]:
-        '''Get images contained in database as `ImageDescriptor` instances.'''
+    def load_all_images(self) -> Iterable[ImageDescriptor]:
+        '''Loads images contained in database
+           as `ImageDescriptor` instances.
+        '''
         with self.db as conn:
-            cursor = conn.execute(_GET_IMAGES) if lst is None \
-                else conn.execute(_GET_IMAGES_IN_LIST, lst.list_id)
-            for row in cursor:
+            for row in conn.execute(_GET_IMAGES):
+                yield self.descriptor_from_row(row)
+
+    def load_list_entries(self, lst: ListDescriptor) \
+            -> Iterable[ImageDescriptor]:
+        '''Loads images belonging to `lst` as `ImageDescriptor` instances.'''
+        with self.db as conn:
+            for row in conn.execute(_GET_IMAGES_IN_LIST, lst.list_id):
                 yield self.descriptor_from_row(row)
 
     def get_recognizer(self) -> 'ImageRecognizer':
-        return ImageRecognizer(self.list_images())
+        return ImageRecognizer(self.load_all_images())
 
 
 class ImageRecognizer:
