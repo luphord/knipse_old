@@ -6,7 +6,8 @@ from datetime import datetime
 import re
 
 from knipse.db import KnipseDB, ImageRecognizer, _INSERT_IMAGE, _DT_FMT
-from knipse.descriptor import ImageDescriptor, ListDescriptor
+from knipse.descriptor import ImageDescriptor, ListDescriptor, \
+                              ListEntryDescriptor
 from knipse.image import descriptor_from_image
 from knipse.walk import walk_images
 from knipse.scan import scan_images
@@ -223,3 +224,27 @@ class TestKnipseDatabase(unittest.TestCase):
             cnt = conn.execute('SELECT count(*) FROM list_entries;') \
                       .fetchone()[0]
             self.assertEqual(len(images), cnt)
+
+    def test_storing_list_entry_descriptors(self) -> None:
+        '''Store list entry in database and check the table count.'''
+        images = [self.example_descriptor] * 3
+        list_descr = self.db.store(self.example_list, images)
+        assert isinstance(list_descr.list_id, int)
+        list_entry_descr = ListEntryDescriptor(None, list_descr.list_id,
+                                               1, 10.0)
+        list_entry_descr = self.db.store(list_entry_descr)
+        self.assertEqual(10.0, list_entry_descr.position)
+        with self.db.db as conn:
+            cnt = conn.execute('SELECT count(*) FROM lists;').fetchone()[0]
+            self.assertEqual(1, cnt)
+            cnt = conn.execute('SELECT count(*) FROM images;').fetchone()[0]
+            self.assertEqual(len(images), cnt)
+            cnt = conn.execute('SELECT count(*) FROM list_entries;') \
+                      .fetchone()[0]
+            self.assertEqual(len(images) + 1, cnt)
+            list_entry_descr.position = 11.0
+            descr2 = self.db.store(list_entry_descr)
+            cnt = conn.execute('SELECT count(*) FROM list_entries;') \
+                      .fetchone()[0]
+            self.assertEqual(len(images) + 1, cnt)  # not increased
+            self.assertEqual(11.0, descr2.position)

@@ -4,10 +4,11 @@ import sqlite3
 from datetime import datetime
 from pathlib import Path
 from collections import Counter
-from typing import Optional, Iterable, Union
+from typing import Optional, Iterable
 import typing
 
-from .descriptor import ImageDescriptor, ListDescriptor
+from .descriptor import ImageDescriptor, ListDescriptor, \
+                        ListEntryDescriptor, BaseDescriptor
 
 
 _CREATE_IMAGE_TABLE = \
@@ -76,6 +77,15 @@ _UPDATE_LIST = \
        WHERE rowid = ?;
     '''
 
+_UPDATE_LIST_ENTRY = \
+    '''UPDATE list_entries
+       SET
+         list_id = ?,
+         image_id = ?,
+         position = ?
+       WHERE rowid = ?;
+    '''
+
 _GET_IMAGES = \
     '''SELECT
          rowid,
@@ -128,9 +138,13 @@ class KnipseDB:
               content: Iterable[ImageDescriptor]) \
         -> ListDescriptor: ...
 
-    def store(self, descriptor: Union[ImageDescriptor, ListDescriptor],
+    @typing.overload
+    def store(self, descriptor: ListEntryDescriptor) \
+        -> ListEntryDescriptor: ...
+
+    def store(self, descriptor: BaseDescriptor,
               content: Iterable[ImageDescriptor] = None) \
-            -> Union[ImageDescriptor, ListDescriptor]:
+            -> BaseDescriptor:
         '''Store various `descriptor` types in the database.
            If `descriptor` contains an ID, the corresponding row
            is updated.
@@ -142,6 +156,8 @@ class KnipseDB:
         elif isinstance(descriptor, ListDescriptor):
             content = content or []
             return self._store_list(descriptor, content)
+        elif isinstance(descriptor, ListEntryDescriptor):
+            return self._store_list_entry(descriptor)
         else:
             raise NotImplementedError('Storing {}'.format(type(descriptor)))
 
@@ -185,6 +201,18 @@ class KnipseDB:
                 conn.execute(_INSERT_LIST_ENTRY,
                              (lst.list_id, img.image_id, float(i)))
             return lst.with_id(list_id)
+
+    def _store_list_entry(self, list_entry: ListEntryDescriptor) \
+            -> ListEntryDescriptor:
+        with self.db as conn:
+            data = (list_entry.list_id, list_entry.image_id,
+                    list_entry.position)
+            if list_entry.list_entry_id is None:
+                cursor = conn.execute(_INSERT_LIST_ENTRY, data)
+            else:
+                cursor = conn.execute(_UPDATE_LIST_ENTRY,
+                                      (*data, list_entry.list_entry_id))
+            return list_entry.with_id(cursor.lastrowid)
 
     def descriptor_from_row(self, row: tuple) -> ImageDescriptor:
         '''Parse, check and convert a database row to an `ImageDescriptor`.'''
