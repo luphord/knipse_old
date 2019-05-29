@@ -4,7 +4,7 @@ import sqlite3
 from datetime import datetime
 from pathlib import Path
 from collections import Counter
-from typing import Optional, Iterable
+from typing import Optional, Iterable, Tuple
 import typing
 
 from .descriptor import ImageDescriptor, ListDescriptor, \
@@ -108,6 +108,9 @@ _GET_IMAGES_IN_LIST = \
          md5,
          dhash,
          active,
+         list_entries.rowid,
+         list_entries.list_id,
+         list_entries.image_id,
          position
        FROM images, list_entries
        WHERE
@@ -275,11 +278,12 @@ class KnipseDB:
                 yield self.descriptor_from_row(row)
 
     def load_list_entries(self, lst: ListDescriptor) \
-            -> Iterable[ImageDescriptor]:
+            -> Iterable[Tuple[ListEntryDescriptor, ImageDescriptor]]:
         '''Loads images belonging to `lst` as `ImageDescriptor` instances.'''
         with self.db as conn:
             for row in conn.execute(_GET_IMAGES_IN_LIST, (lst.list_id,)):
-                yield self.descriptor_from_row(row[:7])
+                lst_entry = ListEntryDescriptor(*row[7:])
+                yield lst_entry, self.descriptor_from_row(row[:7])
 
     def get_recognizer(self) -> 'ImageRecognizer':
         return ImageRecognizer(self.load_all_images())

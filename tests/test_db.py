@@ -226,6 +226,8 @@ class TestKnipseDatabase(unittest.TestCase):
             self.assertEqual(len(images), cnt)
         entries = list(self.db.load_list_entries(lst))
         self.assertEqual(len(images), len(entries))
+        for list_entry, img in entries:
+            self.assertEqual(lst.list_id, list_entry.list_id)
 
     def test_storing_list_entry_descriptors(self) -> None:
         '''Store list entry in database and check the table count.'''
