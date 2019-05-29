@@ -123,3 +123,4 @@ class ListEntryDescriptor(BaseDescriptor):
         yield 'list_entry_id', self.list_entry_id
         yield 'list_id', self.list_id
         yield 'image_id', self.image_id
+        yield 'position', self.position
