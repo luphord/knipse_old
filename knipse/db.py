@@ -107,12 +107,14 @@ _GET_IMAGES_IN_LIST = \
          modified_at,
          md5,
          dhash,
-         active
+         active,
+         position
        FROM images, list_entries
        WHERE
          active = 1
          AND images.rowid = list_entries.image_id
-         AND list_entries.list_id = ?;'''
+         AND list_entries.list_id = ?
+       ORDER BY position;'''
 
 _DT_FMT = '''%Y-%m-%d %H:%M:%S.%f'''
 
@@ -195,12 +197,13 @@ class KnipseDB:
             else:
                 cursor = conn.execute(_UPDATE_LIST, (*data, lst.list_id))
             list_id = cursor.lastrowid
+            lst = lst.with_id(list_id)
             for i, img in enumerate(images):
                 if img.image_id is None:
                     img = self.store(img)
                 conn.execute(_INSERT_LIST_ENTRY,
                              (lst.list_id, img.image_id, float(i)))
-            return lst.with_id(list_id)
+            return lst
 
     def _store_list_entry(self, list_entry: ListEntryDescriptor) \
             -> ListEntryDescriptor:
@@ -275,8 +278,8 @@ class KnipseDB:
             -> Iterable[ImageDescriptor]:
         '''Loads images belonging to `lst` as `ImageDescriptor` instances.'''
         with self.db as conn:
-            for row in conn.execute(_GET_IMAGES_IN_LIST, lst.list_id):
-                yield self.descriptor_from_row(row)
+            for row in conn.execute(_GET_IMAGES_IN_LIST, (lst.list_id,)):
+                yield self.descriptor_from_row(row[:7])
 
     def get_recognizer(self) -> 'ImageRecognizer':
         return ImageRecognizer(self.load_all_images())

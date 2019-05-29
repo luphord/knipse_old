@@ -215,7 +215,7 @@ class TestKnipseDatabase(unittest.TestCase):
     def test_storing_list_descriptors(self) -> None:
         '''Store list in database and check the table count.'''
         images = [self.example_descriptor] * 3
-        self.db.store(self.example_list, images)
+        lst = self.db.store(self.example_list, images)
         with self.db.db as conn:
             cnt = conn.execute('SELECT count(*) FROM lists;').fetchone()[0]
             self.assertEqual(1, cnt)
@@ -224,6 +224,8 @@ class TestKnipseDatabase(unittest.TestCase):
             cnt = conn.execute('SELECT count(*) FROM list_entries;') \
                       .fetchone()[0]
             self.assertEqual(len(images), cnt)
+        entries = list(self.db.load_list_entries(lst))
+        self.assertEqual(len(images), len(entries))
 
     def test_storing_list_entry_descriptors(self) -> None:
         '''Store list entry in database and check the table count.'''
