@@ -12,6 +12,7 @@ from .scan import cli_scan
 from .symlink import cli_symlink
 from .gui import cli_display
 from .show import cli_show
+from .lists import cli_list
 
 
 _DEFAULT_LOGGING_CONFIG = {
@@ -73,6 +74,7 @@ cli_knipse.add_command(cli_scan)
 cli_knipse.add_command(cli_symlink)
 cli_knipse.add_command(cli_display)
 cli_knipse.add_command(cli_show)
+cli_knipse.add_command(cli_list)
 
 
 if __name__ == "__main__":
