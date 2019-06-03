@@ -11,6 +11,11 @@ from .db import ImageRecognizer
 def image_id_from_string(image_str: str,
                          base_folder: Path,
                          recgn: ImageRecognizer) -> int:
+    if image_str.upper().startswith('I'):
+        try:
+            return int(image_str[1:])
+        except ValueError:
+            pass  # we received a path instead of an id and handle it below
     image_descr = recgn.by_path(base_folder, Path(image_str).resolve())
     if not image_descr or image_descr.image_id is None:
         raise Exception('{} not found in database'.format(image_str))

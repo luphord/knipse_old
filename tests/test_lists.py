@@ -25,3 +25,5 @@ class TestKnipseDatabase(unittest.TestCase):
         image_id = image_id_from_string(str(self.src / 'img_0002.jpg'),
                                         self.src, recgn)
         self.assertEqual(1, image_id)
+        image_id = image_id_from_string('I002', self.src, recgn)
+        self.assertEqual(2, image_id)
