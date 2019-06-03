@@ -12,7 +12,7 @@ def image_id_from_string(image_str: str,
                          base_folder: Path,
                          recgn: ImageRecognizer) -> int:
     image_descr = recgn.by_path(base_folder, Path(image_str).resolve())
-    if not image_descr:
+    if not image_descr or image_descr.image_id is None:
         raise Exception('{} not found in database'.format(image_str))
     return image_descr.image_id
 
