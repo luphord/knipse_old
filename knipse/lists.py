@@ -5,6 +5,16 @@ from pathlib import Path
 import click
 
 from .descriptor import ListDescriptor, ListEntryDescriptor
+from .db import ImageRecognizer
+
+
+def image_id_from_string(image_str: str,
+                         base_folder: Path,
+                         recgn: ImageRecognizer) -> int:
+    image_descr = recgn.by_path(base_folder, Path(image_str).resolve())
+    if not image_descr:
+        raise Exception('{} not found in database'.format(image_str))
+    return image_descr.image_id
 
 
 @click.group(name='list')
@@ -47,10 +57,8 @@ def cli_append_to_list(ctx, images, list_id):
     entries = list(db.load_list_entries(lst))
     current_last_position = entries[-1][0].position if entries else 0
     for i, image in enumerate(images):
-        image_descr = recgn.by_path(base_folder, Path(image).resolve())
-        if not image_descr:
-            raise Exception('{} not found in database'.format(image))
-        entry_descr = ListEntryDescriptor(None, lid, image_descr.image_id,
+        image_id = image_id_from_string(image, base_folder, recgn)
+        entry_descr = ListEntryDescriptor(None, lid, image_id,
                                           current_last_position + i + 1)
         db.store(entry_descr)
 
