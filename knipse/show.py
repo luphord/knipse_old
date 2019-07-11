@@ -11,10 +11,17 @@ from .descriptor import ListDescriptor
 def cli_show(ctx, knipse_object):
     '''Show `knipse-object`(s) like lists or images'''
     db = ctx.obj['database']
-    lists = [obj[1:] for obj in knipse_object if obj.upper().startswith('L')]
+    lists = [int(obj[1:])
+             for obj in knipse_object
+             if obj.upper().startswith('L')]
     for list_id in lists:
         for img in db.load_list_entries(ListDescriptor(list_id, None, '')):
             click.echo(img)
+    images = [int(obj[1:])
+              for obj in knipse_object
+              if obj.upper().startswith('I')]
+    for image_id in images:
+        click.echo(db.load_image(image_id))
     if not knipse_object:
         for img in db.load_all_images():
             click.echo(img)

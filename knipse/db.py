@@ -99,6 +99,10 @@ _GET_IMAGES = \
        WHERE
          active = 1;'''
 
+_GET_IMAGES_BY_ID = \
+    _GET_IMAGES[:-1] + \
+    ''' AND rowid=?;'''
+
 _GET_IMAGES_IN_LIST = \
     '''SELECT
          images.rowid,
@@ -276,6 +280,16 @@ class KnipseDB:
         with self.db as conn:
             for row in conn.execute(_GET_IMAGES):
                 yield self.descriptor_from_row(row)
+
+    def load_image(self, image_id: int) -> ImageDescriptor:
+        '''Load image contained in database
+           as `ImageDescriptor` instance.
+        '''
+        with self.db as conn:
+            row = conn.execute(_GET_IMAGES_BY_ID, (image_id,)).fetchone()
+            if not row:
+                raise Exception('Image {} does not exist!'.format(image_id))
+            return self.descriptor_from_row(row)
 
     def load_list_entries(self, lst: ListDescriptor) \
             -> Iterable[Tuple[ListEntryDescriptor, ImageDescriptor]]:
