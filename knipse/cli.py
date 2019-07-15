@@ -11,7 +11,7 @@ from .dhash import cli_dhash
 from .scan import cli_scan
 from .symlink import cli_symlink
 from .gui import cli_display
-from .show import cli_show
+from .show import cli_show_image, cli_show_list
 from .lists import cli_list
 
 
@@ -73,7 +73,8 @@ cli_knipse.add_command(cli_dhash)
 cli_knipse.add_command(cli_scan)
 cli_knipse.add_command(cli_symlink)
 cli_knipse.add_command(cli_display)
-cli_knipse.add_command(cli_show)
+cli_knipse.add_command(cli_show_image)
+cli_knipse.add_command(cli_show_list)
 cli_knipse.add_command(cli_list)
 
 

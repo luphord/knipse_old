@@ -31,26 +31,35 @@ class KnipseFields(click.ParamType):
 FIELDS = KnipseFields()
 
 
-@click.command(name='show')
+@click.command(name='show-list')
 @click.option('-f', '--fields', type=FIELDS, default='image_id;path',
               show_default=True,
               help='fields of knipse object to output')
-@click.argument('knipse-object', type=click.STRING, nargs=-1)
+@click.argument('list-id', type=click.STRING, nargs=-1)
 @click.pass_context
-def cli_show(ctx, fields, knipse_object):
-    '''Show `knipse-object`(s) like lists or images'''
+def cli_show_list(ctx, fields, list_id):
+    '''Show lists corresponding to `list_id`(s)'''
     db = ctx.obj['database']
-    lists = [int(obj[1:])
-             for obj in knipse_object
-             if obj.upper().startswith('L')]
+    lists = [int(obj[1:] if obj.upper().startswith('L') else int(obj))
+             for obj in list_id]
     for list_id in lists:
         for img in db.load_list_entries(ListDescriptor(list_id, None, '')):
             click.echo(fields.tab(img))
-    images = [int(obj[1:])
-              for obj in knipse_object
-              if obj.upper().startswith('I')]
+
+
+@click.command(name='show-image')
+@click.option('-f', '--fields', type=FIELDS, default='image_id;path',
+              show_default=True,
+              help='fields of knipse object to output')
+@click.argument('image-id', type=click.STRING, nargs=-1)
+@click.pass_context
+def cli_show_image(ctx, fields, image_id):
+    '''Show images corresponding to `image_id`(s)'''
+    db = ctx.obj['database']
+    images = [int(obj[1:]) if obj.upper().startswith('I') else int(obj)
+              for obj in image_id]
     for image_id in images:
         click.echo(fields.tab(db.load_image(image_id)))
-    if not knipse_object:
+    if not image_id:
         for img in db.load_all_images():
             click.echo(fields.tab(img))
