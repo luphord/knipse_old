@@ -59,8 +59,9 @@ _DEFAULT_LOGGING_CONFIG = {
 @click.pass_context
 def cli_knipse(ctx, database, source, verbose):
     '''Manage your photo collections and lists.'''
-    click.echo('Starting knipse with database {} and image source {}'
-               .format(database, source))
+    if verbose:
+        click.echo('Starting knipse with database {} and image source {}'
+                   .format(database, source))
     ctx.ensure_object(dict)
     ctx.obj['database'] = KnipseDB(database)
     ctx.obj['source'] = source
