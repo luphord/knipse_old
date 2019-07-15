@@ -47,7 +47,8 @@ def cli_show_list(ctx, fields, list_id):
     lists = [int(obj[1:] if obj.upper().startswith('L') else int(obj))
              for obj in list_id]
     for list_id in lists:
-        for img in db.load_list_entries(ListDescriptor(list_id, None, '')):
+        descr = ListDescriptor(list_id, None, '')
+        for list_entry, img in db.load_list_entries(descr):
             click.echo(fields.tab(img))
 
 
