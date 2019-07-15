@@ -36,8 +36,8 @@ class KnipseFieldsReader:
                 yield from dir_multiple(*obj)
             yield field
 
-    def tab(self, obj):
-        return '\t'.join(str(v) for v in self(obj))
+    def tab(self, *obj):
+        return '\t'.join(str(v) for v in self(*obj))
 
 
 class KnipseFields(click.ParamType):
@@ -68,7 +68,7 @@ def cli_show_list(ctx, fields, list_id):
     for list_id in lists:
         descr = ListDescriptor(list_id, None, '')
         for list_entry, img in db.load_list_entries(descr):
-            click.echo(fields.tab(img))
+            click.echo(fields.tab(list_entry, img))
 
 
 @click.command(name='show-image')
