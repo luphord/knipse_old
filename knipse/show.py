@@ -11,6 +11,10 @@ class KnipseFieldsReader:
 
     def __call__(self, obj):
         for field in self.fields:
+            if field == '*':
+                for any_field in dir(obj):
+                    if not any_field.startswith('_'):
+                        yield getattr(obj, any_field, None)
             yield getattr(obj, field, None)
 
     def tab(self, obj):
@@ -23,7 +27,7 @@ class KnipseFields(click.ParamType):
 
     def convert(self, value, param, ctx):
         try:
-            return KnipseFieldsReader(value.split(';'))
+            return KnipseFieldsReader([f.strip() for f in value.split(';')])
         except ValueError:
             self.fail('{} is not a fields format'.format(value), param, ctx)
 
