@@ -5,17 +5,36 @@ import click
 from .descriptor import ListDescriptor
 
 
+def getattr_multiple(field, *obj):
+    for o in obj:
+        v = getattr(o, field, None)
+        if v is not None:
+            return v
+    return None
+
+
+def dir_multiple(*obj):
+    fields = set([])
+    for o in obj:
+        for field in dir(o):
+            if not field.startswith('_') and field not in fields:
+                fields.add(field)
+                yield field
+
+
 class KnipseFieldsReader:
     def __init__(self, fields):
         self.fields = fields
 
-    def __call__(self, obj):
+    def __call__(self, *obj):
+        for field in self.headers(*obj):
+            yield getattr_multiple(field, *obj)
+
+    def headers(self, *obj):
         for field in self.fields:
             if field == '*':
-                for any_field in dir(obj):
-                    if not any_field.startswith('_'):
-                        yield getattr(obj, any_field, None)
-            yield getattr(obj, field, None)
+                yield from dir_multiple(*obj)
+            yield field
 
     def tab(self, obj):
         return '\t'.join(str(v) for v in self(obj))
