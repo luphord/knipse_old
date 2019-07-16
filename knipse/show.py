@@ -66,15 +66,21 @@ FIELDS = KnipseFields()
 @click.option('-f', '--fields', type=FIELDS, default='image_id;path',
               show_default=True,
               help='fields of knipse object to output')
+@click.option('-h', '--header/--no-header', default=False,
+              show_default=True,
+              help='print column headers')
 @click.argument('list-id', type=click.STRING, nargs=-1)
 @click.pass_context
-def cli_show_list(ctx, fields, list_id):
+def cli_show_list(ctx, fields, header, list_id):
     '''Show lists corresponding to `list_id`(s)'''
     db = ctx.obj['database']
     list_ids = [int(obj[1:] if obj.upper().startswith('L') else int(obj))
                 for obj in list_id]
-    lists = [db.load_list_entries(ListDescriptor(list_id, None, ''))
+    lists = [list(db.load_list_entries(ListDescriptor(list_id, None, '')))
              for list_id in list_ids]
+    first_img = lists[0][0] if lists and lists[0] else []
+    if header:
+        click.echo(fields.headers_tab(*first_img))
     for lst in lists:
         for list_entry, img in lst:
             click.echo(fields.tab(list_entry, img))
