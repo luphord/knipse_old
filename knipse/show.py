@@ -88,7 +88,8 @@ def cli_show_list(ctx, fields, header, list_id):
 
 
 @click.command(name='show-image')
-@click.option('-f', '--fields', type=FIELDS, default='image_id;path',
+@click.option('-f', '--fields', type=FIELDS,
+              default='image_id;active;created_at;path',
               show_default=True,
               help='fields of knipse object to output')
 @click.option('-h', '--header/--no-header', default=False,
