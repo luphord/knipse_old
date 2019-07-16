@@ -63,7 +63,8 @@ FIELDS = KnipseFields()
 
 
 @click.command(name='show-list')
-@click.option('-f', '--fields', type=FIELDS, default='image_id;path',
+@click.option('-f', '--fields', type=FIELDS,
+              default='list_id;list_entry_id;image_id;position;path',
               show_default=True,
               help='fields of knipse object to output')
 @click.option('-h', '--header/--no-header', default=False,
