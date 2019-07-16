@@ -39,6 +39,9 @@ class KnipseFieldsReader:
     def tab(self, *obj):
         return '\t'.join(str(v) for v in self(*obj))
 
+    def headers_tab(self, *obj):
+        return '\t'.join(str(v) for v in self.headers(*obj))
+
 
 class KnipseFields(click.ParamType):
     '''Parameter type a list of fields (separated by semicolon)'''
@@ -75,15 +78,23 @@ def cli_show_list(ctx, fields, list_id):
 @click.option('-f', '--fields', type=FIELDS, default='image_id;path',
               show_default=True,
               help='fields of knipse object to output')
+@click.option('-h', '--header/--no-header', default=False,
+              show_default=True,
+              help='print column headers')
 @click.argument('image-id', type=click.STRING, nargs=-1)
 @click.pass_context
-def cli_show_image(ctx, fields, image_id):
+def cli_show_image(ctx, fields, header, image_id):
     '''Show images corresponding to `image_id`(s)'''
     db = ctx.obj['database']
-    images = [int(obj[1:]) if obj.upper().startswith('I') else int(obj)
-              for obj in image_id]
-    for image_id in images:
-        click.echo(fields.tab(db.load_image(image_id)))
     if not image_id:
-        for img in db.load_all_images():
-            click.echo(fields.tab(img))
+        images = list(db.load_all_images())
+    else:
+        image_ids = [int(obj[1:])
+                     if obj.upper().startswith('I')
+                     else int(obj)
+                     for obj in image_id]
+        images = [db.load_image(img_id) for img_id in image_ids]
+    if header:
+        click.echo(fields.headers_tab(images[0] if images else None))
+    for image in images:
+        click.echo(fields.tab(image))
