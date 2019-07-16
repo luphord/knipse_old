@@ -71,11 +71,12 @@ FIELDS = KnipseFields()
 def cli_show_list(ctx, fields, list_id):
     '''Show lists corresponding to `list_id`(s)'''
     db = ctx.obj['database']
-    lists = [int(obj[1:] if obj.upper().startswith('L') else int(obj))
-             for obj in list_id]
-    for list_id in lists:
-        descr = ListDescriptor(list_id, None, '')
-        for list_entry, img in db.load_list_entries(descr):
+    list_ids = [int(obj[1:] if obj.upper().startswith('L') else int(obj))
+                for obj in list_id]
+    lists = [db.load_list_entries(ListDescriptor(list_id, None, ''))
+             for list_id in list_ids]
+    for lst in lists:
+        for list_entry, img in lst:
             click.echo(fields.tab(list_entry, img))
 
 
