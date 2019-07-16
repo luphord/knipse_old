@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from types import MethodType
+
 import click
 
 from .descriptor import ListDescriptor
@@ -17,7 +19,9 @@ def dir_multiple(*obj):
     fields = set([])
     for o in obj:
         for field in dir(o):
-            if not field.startswith('_') and field not in fields:
+            if not field.startswith('_') \
+                    and field not in fields \
+                    and not isinstance(getattr(o, field), MethodType):
                 fields.add(field)
                 yield field
 
