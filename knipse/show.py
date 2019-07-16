@@ -34,7 +34,8 @@ class KnipseFieldsReader:
         for field in self.fields:
             if field == '*':
                 yield from dir_multiple(*obj)
-            yield field
+            else:
+                yield field
 
     def tab(self, *obj):
         return '\t'.join(str(v) for v in self(*obj))
