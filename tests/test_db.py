@@ -22,7 +22,7 @@ def store_images(db, base_folder: Path) -> None:
     for file_path, img, progress \
             in walk_images(base_folder, skip_thumbnail_folders=True):
         descr = descriptor_from_image(base_folder, file_path, img)
-        db.store(descr)
+        db.store_image(descr)
 
 
 class TestKnipseDatabase(unittest.TestCase):
@@ -66,7 +66,7 @@ class TestKnipseDatabase(unittest.TestCase):
         '''Store image with creation and modification date
            set to None (should be null in database).
         '''
-        self.db.store(self.example_descriptor)
+        self.db.store_image(self.example_descriptor)
         retrieved_descr = list(self.db.load_all_images())[0]
         retrieved_descr.image_id = None
         self.assertEqual(self.example_descriptor, retrieved_descr)
@@ -141,11 +141,11 @@ class TestKnipseDatabase(unittest.TestCase):
         '''Store image in database, then store again
            and test if it was updated.
         '''
-        self.db.store(self.example_descriptor)
+        self.db.store_image(self.example_descriptor)
         retrieved_images = list(self.db.load_all_images())
         self.assertEqual(1, len(retrieved_images))
         retrieved_descr = retrieved_images[0]
-        self.db.store(retrieved_descr)  # should only update, not insert
+        self.db.store_image(retrieved_descr)  # should only update, not insert
         self.assertEqual(1, len(list(self.db.load_all_images())))
 
     def test_walking_known_images_in_db(self) -> None:
@@ -215,7 +215,7 @@ class TestKnipseDatabase(unittest.TestCase):
     def test_storing_list_descriptors(self) -> None:
         '''Store list in database and check the table count.'''
         images = [self.example_descriptor] * 3
-        lst = self.db.store(self.example_list, images)
+        lst = self.db.store_list(self.example_list, images)
         with self.db.db as conn:
             cnt = conn.execute('SELECT count(*) FROM lists;').fetchone()[0]
             self.assertEqual(1, cnt)
@@ -232,11 +232,11 @@ class TestKnipseDatabase(unittest.TestCase):
     def test_storing_list_entry_descriptors(self) -> None:
         '''Store list entry in database and check the table count.'''
         images = [self.example_descriptor] * 3
-        list_descr = self.db.store(self.example_list, images)
+        list_descr = self.db.store_list(self.example_list, images)
         assert isinstance(list_descr.list_id, int)
         list_entry_descr = ListEntryDescriptor(None, list_descr.list_id,
                                                1, 10.0)
-        list_entry_descr = self.db.store(list_entry_descr)
+        list_entry_descr = self.db.store_list_entry(list_entry_descr)
         self.assertEqual(10.0, list_entry_descr.position)
         with self.db.db as conn:
             cnt = conn.execute('SELECT count(*) FROM lists;').fetchone()[0]
@@ -247,7 +247,7 @@ class TestKnipseDatabase(unittest.TestCase):
                       .fetchone()[0]
             self.assertEqual(len(images) + 1, cnt)
             list_entry_descr.position = 11.0
-            descr2 = self.db.store(list_entry_descr)
+            descr2 = self.db.store_list_entry(list_entry_descr)
             cnt = conn.execute('SELECT count(*) FROM list_entries;') \
                       .fetchone()[0]
             self.assertEqual(len(images) + 1, cnt)  # not increased

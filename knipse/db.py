@@ -5,10 +5,9 @@ from datetime import datetime
 from pathlib import Path
 from collections import Counter
 from typing import Optional, Iterable, Tuple
-import typing
 
 from .descriptor import ImageDescriptor, ListDescriptor, \
-                        ListEntryDescriptor, BaseDescriptor
+                        ListEntryDescriptor
 
 
 _CREATE_IMAGE_TABLE = \
@@ -139,37 +138,6 @@ class KnipseDB:
             conn.execute(_CREATE_LISTS_TABLE)
             conn.execute(_CREATE_LIST_ENTRIES_TABLE)
 
-    @typing.overload
-    def store(self, descriptor: ImageDescriptor) -> ImageDescriptor: ...
-
-    @typing.overload
-    def store(self, descriptor: ListDescriptor,
-              content: Iterable[ImageDescriptor]) \
-        -> ListDescriptor: ...
-
-    @typing.overload
-    def store(self, descriptor: ListEntryDescriptor) \
-        -> ListEntryDescriptor: ...
-
-    def store(self, descriptor: BaseDescriptor,
-              content: Iterable[ImageDescriptor] = None) \
-            -> BaseDescriptor:
-        '''Store various `descriptor` types in the database.
-           If `descriptor` contains an ID, the corresponding row
-           is updated.
-        '''
-        if isinstance(descriptor, ImageDescriptor):
-            assert content is None, \
-                'Cannot store an ImageDescriptor with content'
-            return self.store_image(descriptor)
-        elif isinstance(descriptor, ListDescriptor):
-            content = content or []
-            return self.store_list(descriptor, content)
-        elif isinstance(descriptor, ListEntryDescriptor):
-            return self.store_list_entry(descriptor)
-        else:
-            raise NotImplementedError('Storing {}'.format(type(descriptor)))
-
     def store_image(self, descriptor: ImageDescriptor) -> ImageDescriptor:
         '''Store `descriptor` in the database. If `descriptor` contains
            an `image_id`, the corresponding row in the database is updated.
@@ -212,7 +180,7 @@ class KnipseDB:
             lst = lst.with_id(list_id)
             for i, img in enumerate(images):
                 if img.image_id is None:
-                    img = self.store(img)
+                    img = self.store_image(img)
                 conn.execute(_INSERT_LIST_ENTRY,
                              (lst.list_id, img.image_id, float(i)))
             return lst

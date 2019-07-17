@@ -33,9 +33,9 @@ def scan_images(db: KnipseDB, base_folder: Path,
         looked_up_by_md5 = recgn.by_md5(descr.md5)
         if looked_up_by_md5:  # image was moved
             descr.image_id = looked_up_by_md5.image_id
-            db.store(descr)
+            db.store_image(descr)
         else:  # new image
-            db.store(descr)
+            db.store_image(descr)
             yield file_path, progress
 
 

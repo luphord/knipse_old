@@ -41,7 +41,7 @@ def cli_list(ctx):
 def cli_create_list(ctx, name, virtual_folder):
     '''Create a new list.'''
     db = ctx.obj['database']
-    lst = db.store(ListDescriptor(None, name, str(virtual_folder)))
+    lst = db.store_list(ListDescriptor(None, name, str(virtual_folder)))
     click.echo('Created list {!r}'.format(lst))
 
 
@@ -65,7 +65,7 @@ def cli_append_to_list(ctx, images, list_id):
         image_id = image_id_from_string(image, base_folder, recgn)
         entry_descr = ListEntryDescriptor(None, lid, image_id,
                                           current_last_position + i + 1)
-        db.store(entry_descr)
+        db.store_list_entry(entry_descr)
 
 
 cli_list.add_command(cli_create_list)
