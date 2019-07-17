@@ -163,7 +163,7 @@ class KnipseDB:
             return descriptor.with_id(cursor.lastrowid)
 
     def store_list(self, lst: ListDescriptor,
-                   images: Iterable[ImageDescriptor]) \
+                   images: Iterable[ImageDescriptor] = []) \
             -> ListDescriptor:
         '''Store `lst` in the database. If `lst` contains
            a `list_id`, the corresponding row in the database is updated.
