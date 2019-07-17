@@ -161,16 +161,16 @@ class KnipseDB:
         if isinstance(descriptor, ImageDescriptor):
             assert content is None, \
                 'Cannot store an ImageDescriptor with content'
-            return self._store_image(descriptor)
+            return self.store_image(descriptor)
         elif isinstance(descriptor, ListDescriptor):
             content = content or []
-            return self._store_list(descriptor, content)
+            return self.store_list(descriptor, content)
         elif isinstance(descriptor, ListEntryDescriptor):
-            return self._store_list_entry(descriptor)
+            return self.store_list_entry(descriptor)
         else:
             raise NotImplementedError('Storing {}'.format(type(descriptor)))
 
-    def _store_image(self, descriptor: ImageDescriptor) -> ImageDescriptor:
+    def store_image(self, descriptor: ImageDescriptor) -> ImageDescriptor:
         '''Store `descriptor` in the database. If `descriptor` contains
            an `image_id`, the corresponding row in the database is updated.
         '''
@@ -194,9 +194,14 @@ class KnipseDB:
                                       (*data, descriptor.image_id))
             return descriptor.with_id(cursor.lastrowid)
 
-    def _store_list(self, lst: ListDescriptor,
-                    images: Iterable[ImageDescriptor]) \
+    def store_list(self, lst: ListDescriptor,
+                   images: Iterable[ImageDescriptor]) \
             -> ListDescriptor:
+        '''Store `lst` in the database. If `lst` contains
+           a `list_id`, the corresponding row in the database is updated.
+           All given `images` are stored (i.e. inserted or updated) and
+           appended to the list (no update here, just insert).
+        '''
         with self.db as conn:
             data = (lst.name, str(lst.virtual_folder))
             if lst.list_id is None:
@@ -212,8 +217,11 @@ class KnipseDB:
                              (lst.list_id, img.image_id, float(i)))
             return lst
 
-    def _store_list_entry(self, list_entry: ListEntryDescriptor) \
+    def store_list_entry(self, list_entry: ListEntryDescriptor) \
             -> ListEntryDescriptor:
+        '''Store `list_entry` in the database. If `list_entry` contains
+           a `list_entry_id`, the corresponding row in the database is updated.
+        '''
         with self.db as conn:
             data = (list_entry.list_id, list_entry.image_id,
                     list_entry.position)
