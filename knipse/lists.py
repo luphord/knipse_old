@@ -73,7 +73,7 @@ def cli_append_to_list(ctx, images, list_id):
 @click.option('-f', '--fields', type=FIELDS,
               default='list_id;list_entry_id;image_id;position;path',
               show_default=True,
-              help='fields of knipse object to output')
+              help='fields of list/list entry/image to output')
 @click.option('-h', '--header/--no-header', default=False,
               show_default=True,
               help='print column headers')
@@ -94,6 +94,26 @@ def cli_show_list(ctx, fields, header, list_id):
             click.echo(fields.tab(list_entry, img))
 
 
+@click.command(name='list')
+@click.option('-f', '--fields', type=FIELDS,
+              default='list_id;name;virtual_folder',
+              show_default=True,
+              help='fields of list to output')
+@click.option('-h', '--header/--no-header', default=False,
+              show_default=True,
+              help='print column headers')
+@click.pass_context
+def cli_list_list(ctx, fields, header):
+    '''List available lists'''
+    db = ctx.obj['database']
+    lists = list(db.load_all_list_descriptors())
+    if header:
+        click.echo(fields.headers_tab(lists[0] if lists else None))
+    for lst in lists:
+        click.echo(fields.tab(lst))
+
+
 cli_list.add_command(cli_create_list)
 cli_list.add_command(cli_append_to_list)
 cli_list.add_command(cli_show_list)
+cli_list.add_command(cli_list_list)
