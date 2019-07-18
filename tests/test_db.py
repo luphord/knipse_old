@@ -252,3 +252,12 @@ class TestKnipseDatabase(unittest.TestCase):
                       .fetchone()[0]
             self.assertEqual(len(images) + 1, cnt)  # not increased
             self.assertEqual(11.0, descr2.position)
+
+    def test_loading_all_list_descriptors(self) -> None:
+        '''Store list in database and load again.'''
+        images = [self.example_descriptor] * 3
+        lists = []
+        lists.append(self.db.store_list(self.example_list, images))
+        lists.append(self.db.store_list(self.example_list, images))
+        loaded_lists = list(self.db.load_all_list_descriptors())
+        self.assertEqual(lists, loaded_lists)

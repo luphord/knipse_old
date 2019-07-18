@@ -122,6 +122,14 @@ _GET_IMAGES_IN_LIST = \
          AND list_entries.list_id = ?
        ORDER BY position;'''
 
+_GET_LISTS = \
+    '''SELECT
+         rowid,
+         name,
+         virtual_folder
+       FROM lists;
+    '''
+
 _DT_FMT = '''%Y-%m-%d %H:%M:%S.%f'''
 
 
@@ -274,6 +282,12 @@ class KnipseDB:
             for row in conn.execute(_GET_IMAGES_IN_LIST, (lst.list_id,)):
                 lst_entry = ListEntryDescriptor(*row[7:])
                 yield lst_entry, self.descriptor_from_row(row[:7])
+
+    def load_all_list_descriptors(self) -> Iterable[ListDescriptor]:
+        '''Loads lists contained in database as `ListDescriptor` instances'''
+        with self.db as conn:
+            for row in conn.execute(_GET_LISTS):
+                yield ListDescriptor(int(row[0]), row[1], Path(row[2]))
 
     def get_recognizer(self) -> 'ImageRecognizer':
         return ImageRecognizer(self.load_all_images())
