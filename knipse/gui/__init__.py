@@ -1,3 +1,3 @@
-from .display import cli_display
+from .display import cli_display, cli_kivy
 
-__all__ = ['cli_display']
+__all__ = ['cli_display', 'cli_kivy']

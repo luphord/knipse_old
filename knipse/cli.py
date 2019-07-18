@@ -10,7 +10,7 @@ from .db import KnipseDB
 from .dhash import cli_dhash
 from .scan import cli_scan
 from .symlink import cli_symlink
-from .gui import cli_display
+from .gui import cli_display, cli_kivy
 from .show import cli_show_image
 from .lists import cli_list
 
@@ -76,6 +76,7 @@ cli_knipse.add_command(cli_symlink)
 cli_knipse.add_command(cli_display)
 cli_knipse.add_command(cli_show_image)
 cli_knipse.add_command(cli_list)
+cli_knipse.add_command(cli_kivy)
 
 
 if __name__ == "__main__":

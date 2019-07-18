@@ -8,6 +8,12 @@ from datetime import datetime, timedelta
 
 from PIL import ImageTk, Image
 import click
+import kivy
+from kivy.app import App
+from kivy.uix.label import Label
+
+
+kivy.require('1.11.0')
 
 
 def grid_fill(widget, parent):
@@ -91,3 +97,14 @@ def cli_display(path):
     grid_fill(imgd, root)
 
     root.mainloop()
+
+
+class KnipseApp(App):
+    def build(self):
+        return Label(text='Welcome to Knipse')
+
+
+@click.command(name='kivy')
+def cli_kivy():
+    '''Experiment with kivy.'''
+    KnipseApp().run()
