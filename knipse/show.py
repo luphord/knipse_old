@@ -16,7 +16,7 @@ from .util import FIELDS
 @click.argument('image-id', type=click.STRING, nargs=-1)
 @click.pass_context
 def cli_show_image(ctx, fields, header, image_id):
-    '''Show images corresponding to `image_id`(s)'''
+    '''Show images corresponding to `image_id`(s).'''
     db = ctx.obj['database']
     if not image_id:
         images = list(db.load_all_images())

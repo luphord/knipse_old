@@ -80,7 +80,7 @@ def cli_append_to_list(ctx, images, list_id):
 @click.argument('list-id', type=click.STRING, nargs=-1)
 @click.pass_context
 def cli_show_list(ctx, fields, header, list_id):
-    '''Show lists corresponding to `list_id`(s)'''
+    '''Show lists corresponding to `list_id`(s).'''
     db = ctx.obj['database']
     list_ids = [int(obj[1:] if obj.upper().startswith('L') else int(obj))
                 for obj in list_id]
@@ -104,7 +104,7 @@ def cli_show_list(ctx, fields, header, list_id):
               help='print column headers')
 @click.pass_context
 def cli_list_list(ctx, fields, header):
-    '''List available lists'''
+    '''List available lists.'''
     db = ctx.obj['database']
     lists = list(db.load_all_list_descriptors())
     if header:
