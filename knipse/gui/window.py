@@ -39,6 +39,8 @@ class FolderTreeWidget(FloatLayout):
                 if parent not in nodes:
                     node = TreeViewLabel(text=parent.name)
                     nodes[parent] = tree.add_node(node, nodes[parent.parent])
+            node = TreeViewLabel(text=img.path.name)
+            tree.add_node(node, nodes[img.path.parent])
         self.add_widget(tree)
 
 
