@@ -94,7 +94,9 @@ def cli_display(path):
 
 
 @click.command(name='kivy')
-def cli_kivy():
+@click.pass_context
+def cli_kivy(ctx):
     '''Experiment with kivy.'''
     from .window import KnipseApp
-    KnipseApp().run()
+    db = ctx.obj['database']
+    KnipseApp(db).run()
