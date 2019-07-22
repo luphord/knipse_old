@@ -37,7 +37,7 @@ class FolderTreeWidget(FloatLayout):
         for img in islice(images, 10):
             for parent in reversed(img.path.parents):
                 if parent not in nodes:
-                    node = TreeViewLabel(text=str(parent))
+                    node = TreeViewLabel(text=parent.name)
                     nodes[parent] = tree.add_node(node, nodes[parent.parent])
         self.add_widget(tree)
 
