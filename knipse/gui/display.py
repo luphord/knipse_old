@@ -99,4 +99,5 @@ def cli_kivy(ctx):
     '''Experiment with kivy.'''
     from .window import KnipseApp
     db = ctx.obj['database']
-    KnipseApp(db).run()
+    base_folder = ctx.obj['source']
+    KnipseApp(db, base_folder).run()
