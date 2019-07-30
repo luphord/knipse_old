@@ -21,9 +21,9 @@ kivy.require('1.11.0')
 
 class SelectableTreeViewLabel(TreeViewLabel):
     def __init__(self, path, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.register_event_type('on_path_changed')
         self.path = path
-        super().__init__(*args, **kwargs)
 
     def on_touch_down(self, *args):
         self.dispatch('on_path_changed', self.path)
