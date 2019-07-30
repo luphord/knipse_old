@@ -32,7 +32,7 @@ class ImageList(BoxLayout):
         self.clear_widgets()
         folder = Path(self.selected_path)
         for descr in self.db.load_all_images():
-            if folder in descr.path.parents:
+            if descr.path.parent == folder:
                 self.add_widget(Label(text=str(descr.path)))
 
     def on_selected_path(self, *args):
