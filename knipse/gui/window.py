@@ -78,8 +78,6 @@ class FolderTreeWidget(FloatLayout):
                                                    text=parent.name)
                     node.bind(on_path_changed=self.on_nodes_path_changed)
                     nodes[parent] = tree.add_node(node, nodes[parent.parent])
-            node = TreeViewLabel(text=img.path.name)
-            tree.add_node(node, nodes[img.path.parent])
         self.add_widget(tree)
 
 
