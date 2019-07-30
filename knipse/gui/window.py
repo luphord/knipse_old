@@ -82,13 +82,9 @@ class FolderTreeWidget(FloatLayout):
 
 
 class KnipseApp(App):
-    selected_path = StringProperty('asd')
 
     def __init__(self, db: KnipseDB, base_folder: Path, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.db = db
         self.base_folder = base_folder
         self.test_img = str(self.base_folder / self.db.load_image(1).path)
-
-    def on_selected_path(self, *args):
-        print('App', *args)
