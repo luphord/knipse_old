@@ -2,7 +2,6 @@
 
 '''GUI experiments with kivy'''
 
-from itertools import islice
 from typing import Iterable
 from pathlib import Path
 
@@ -71,7 +70,7 @@ class FolderTreeWidget(FloatLayout):
                   images: Iterable[ImageDescriptor]):
         tree = TreeView(root_options=dict(text=root_label))
         nodes = {Path('.'): None}
-        for img in islice(images, 10):
+        for img in images:
             for parent in reversed(img.path.parents):
                 if parent not in nodes:
                     node = SelectableTreeViewLabel(path=parent,
