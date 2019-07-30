@@ -20,12 +20,13 @@ kivy.require('1.11.0')
 
 
 class SelectableTreeViewLabel(TreeViewLabel):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, path, *args, **kwargs):
         self.register_event_type('on_path_changed')
+        self.path = path
         super().__init__(*args, **kwargs)
 
     def on_touch_down(self, *args):
-        self.dispatch('on_path_changed', self.text)
+        self.dispatch('on_path_changed', self.path)
 
     def on_path_changed(self, *args):
         pass
@@ -43,7 +44,7 @@ class FolderTreeWidget(FloatLayout):
         self._populate(self.root_label, self.db.load_all_images())
 
     def on_nodes_path_changed(self, node, path):
-        self.selected_path = path
+        self.selected_path = str(path)
 
     def _populate(self,
                   root_label: str,
@@ -53,7 +54,8 @@ class FolderTreeWidget(FloatLayout):
         for img in islice(images, 10):
             for parent in reversed(img.path.parents):
                 if parent not in nodes:
-                    node = SelectableTreeViewLabel(text=parent.name)
+                    node = SelectableTreeViewLabel(path=parent,
+                                                   text=parent.name)
                     node.bind(on_path_changed=self.on_nodes_path_changed)
                     nodes[parent] = tree.add_node(node, nodes[parent.parent])
             node = TreeViewLabel(text=img.path.name)
