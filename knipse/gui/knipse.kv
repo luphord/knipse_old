@@ -10,13 +10,9 @@ BoxLayout:
     BoxLayout:
         size_hint: (0.7, 1)
         orientation: "vertical"
-        Button:
-            text: "Test 1"
-        Image:
-            source: app.test_img
-        Button:
-            text: "Test 2"
-        Button:
+        Label:
+            size_hint: (1, 0.1)
             text: tree.selected_path
-        Button:
-            text: "Test 3"
+        ImageList:
+            db: app.db
+            selected_path: tree.selected_path

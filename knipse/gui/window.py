@@ -8,7 +8,9 @@ from pathlib import Path
 
 import kivy
 from kivy.app import App
+from kivy.uix.label import Label
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.treeview import TreeView, TreeViewLabel
 from kivy.properties import ObjectProperty, StringProperty
 
@@ -17,6 +19,24 @@ from ..image import ImageDescriptor
 
 
 kivy.require('1.11.0')
+
+
+class ImageList(BoxLayout):
+    db = ObjectProperty(None)
+    selected_path = StringProperty('')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, orientation='vertical', **kwargs)
+
+    def _populate(self):
+        self.clear_widgets()
+        folder = Path(self.selected_path)
+        for descr in self.db.load_all_images():
+            if folder in descr.path.parents:
+                self.add_widget(Label(text=str(descr.path)))
+
+    def on_selected_path(self, *args):
+        self._populate()
 
 
 class SelectableTreeViewLabel(TreeViewLabel):
