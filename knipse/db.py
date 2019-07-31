@@ -38,6 +38,17 @@ _CREATE_LIST_ENTRIES_TABLE = \
     );
     '''
 
+THUMBNAIL_SIZES = ('t120x80', 't300x200')
+
+_CREATE_THUMBNAILS_TABLE = \
+    '''CREATE TABLE IF NOT EXISTS thumbnails (
+        image_id int,
+        t120x80 blob,
+        t300x200 blob,
+        FOREIGN KEY (image_id) REFERENCES images
+    );
+    '''
+
 _INSERT_IMAGE = \
     '''INSERT INTO images VALUES (
         ?, ?, ?, ?, ?, ?
@@ -52,6 +63,12 @@ _INSERT_LIST = \
 
 _INSERT_LIST_ENTRY = \
     '''INSERT INTO list_entries VALUES (
+        ?, ?, ?
+    );
+    '''
+
+_INSERT_THUMBNAIL = \
+    '''INSERT INTO thumbnails VALUES (
         ?, ?, ?
     );
     '''
@@ -83,6 +100,13 @@ _UPDATE_LIST_ENTRY = \
          image_id = ?,
          position = ?
        WHERE rowid = ?;
+    '''
+
+_UPDATE_THUMBNAIL = \
+    '''UPDATE thumbnails
+       SET
+         {} = ?,
+       WHERE image_id = ?;
     '''
 
 _GET_IMAGES = \
@@ -130,6 +154,13 @@ _GET_LISTS = \
        FROM lists;
     '''
 
+_GET_THUMBNAIL = \
+    '''SELECT
+         *
+       FROM thumbnails
+       WHERE
+         image_id = ?;'''
+
 _DT_FMT = '''%Y-%m-%d %H:%M:%S.%f'''
 
 
@@ -145,6 +176,7 @@ class KnipseDB:
             conn.execute(_CREATE_IMAGE_TABLE)
             conn.execute(_CREATE_LISTS_TABLE)
             conn.execute(_CREATE_LIST_ENTRIES_TABLE)
+            conn.execute(_CREATE_THUMBNAILS_TABLE)
 
     def store_image(self, descriptor: ImageDescriptor) -> ImageDescriptor:
         '''Store `descriptor` in the database. If `descriptor` contains
@@ -207,6 +239,26 @@ class KnipseDB:
                 cursor = conn.execute(_UPDATE_LIST_ENTRY,
                                       (*data, list_entry.list_entry_id))
             return list_entry.with_id(cursor.lastrowid)
+
+    @staticmethod
+    def _thumbnail_data(descriptor: ImageDescriptor, thumbnail: bytes,
+                        size: str):
+        yield descriptor.image_id
+        yield thumbnail if size == 't120x80' else None
+        yield thumbnail if size == 't300x200' else None
+
+    def store_thumbnail(self, descriptor: ImageDescriptor,
+                        thumbnail: bytes, size: str):
+        assert size in THUMBNAIL_SIZES
+        with self.db as conn:
+            cursor = conn.execute(_GET_THUMBNAIL, (descriptor.image_id, ))
+            if cursor.rows:
+                update_data = (descriptor.image_id, thumbnail)
+                conn.execute(_UPDATE_THUMBNAIL.format(size), update_data)
+            else:
+                data = tuple(KnipseDB._thumbnail_data(descriptor, thumbnail,
+                                                      size))
+                conn.execute(_INSERT_THUMBNAIL, data)
 
     def descriptor_from_row(self, row: tuple) -> ImageDescriptor:
         '''Parse, check and convert a database row to an `ImageDescriptor`.'''
