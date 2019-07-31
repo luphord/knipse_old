@@ -110,5 +110,5 @@ def cli_purge(ctx):
     base_folder = ctx.obj['source']
     click.echo('Purging images in {}...'.format(base_folder))
     for descr in purge_images(db, base_folder):
-        click.echo('Deactivating {}'.format(descr.path))    
-    click.echo('Scan completed')
+        click.echo('Deactivating {}'.format(descr.path))
+    click.echo('Purge completed')
