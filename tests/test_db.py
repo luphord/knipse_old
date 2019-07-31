@@ -10,7 +10,7 @@ from knipse.descriptor import ImageDescriptor, ListDescriptor, \
                               ListEntryDescriptor
 from knipse.image import descriptor_from_image
 from knipse.walk import walk_images
-from knipse.scan import scan_images
+from knipse.scan import scan_images, purge_images
 
 from .test_walk import EXPECTED_IMAGES
 
@@ -185,6 +185,20 @@ class TestKnipseDatabase(unittest.TestCase):
         for file_path, progress in scan_images(self.db, self.src,
                                                skip_thumbnail_folders=True):
             raise Exception('should not happen')
+
+    def test_purge(self) -> None:
+        '''Scan a folder structure to store images,
+           then chose other folder as base and purge.'''
+        cnt = 0
+        for file_path, progress in scan_images(self.db, self.src,
+                                               skip_thumbnail_folders=True):
+            cnt += 1
+        self.assertEqual(len(EXPECTED_IMAGES), cnt)
+        cnt_purged = 0
+        for descr in purge_images(self.db, self.src / 'folder1'):
+            cnt_purged += 1
+        self.assertEqual(cnt, cnt_purged)
+        self.assertEqual(0, len(list(self.db.load_all_images())))
 
     def test_scan_and_scan_subfolder_again(self) -> None:
         '''Scan a folder structure to store images,
