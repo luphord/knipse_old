@@ -8,7 +8,7 @@ import logging.config
 
 from .db import KnipseDB
 from .dhash import cli_dhash
-from .scan import cli_scan
+from .scan import cli_scan, cli_purge
 from .symlink import cli_symlink
 from .gui import cli_display, cli_kivy
 from .show import cli_show_image
@@ -79,6 +79,7 @@ cli_knipse.add_command(cli_show_image)
 cli_knipse.add_command(cli_list)
 cli_knipse.add_command(cli_kivy)
 cli_knipse.add_command(cli_update_thumbnails)
+cli_knipse.add_command(cli_purge)
 
 
 if __name__ == "__main__":

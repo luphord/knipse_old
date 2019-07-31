@@ -9,6 +9,7 @@ import click
 from .db import KnipseDB
 from .walk import walk_images
 from .image import descriptor_from_image
+from .descriptor import ImageDescriptor
 
 
 def scan_images(db: KnipseDB, base_folder: Path,
@@ -37,6 +38,18 @@ def scan_images(db: KnipseDB, base_folder: Path,
         else:  # new image
             db.store_image(descr)
             yield file_path, progress
+
+
+def purge_images(db: KnipseDB, base_folder: Path) \
+        -> Iterable[ImageDescriptor]:
+    '''Check all images in database if they are still present
+       and deactivate them otherwise.
+    '''
+    for descr in db.load_all_images():
+        if not (base_folder / descr.path).exists():
+            descr.active = False
+            db.store_image(descr)
+            yield descr
 
 
 def _format_timedelta(dt):
@@ -85,4 +98,17 @@ def cli_scan(ctx, skip_thumbnails):
         line_length = len(line)
         click.echo(line, nl=False)
     click.echo()
+    click.echo('Scan completed')
+
+
+@click.command(name='purge')
+@click.pass_context
+def cli_purge(ctx):
+    '''Deactivate images that do not exist anymore.
+    '''
+    db = ctx.obj['database']
+    base_folder = ctx.obj['source']
+    click.echo('Purging images in {}...'.format(base_folder))
+    for descr in purge_images(db, base_folder):
+        click.echo('Deactivating {}'.format(descr.path))    
     click.echo('Scan completed')
