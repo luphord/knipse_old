@@ -13,6 +13,7 @@ from .symlink import cli_symlink
 from .gui import cli_display, cli_kivy
 from .show import cli_show_image
 from .lists import cli_list
+from .thumbnail import cli_update_thumbnails
 
 
 _DEFAULT_LOGGING_CONFIG = {
@@ -77,6 +78,7 @@ cli_knipse.add_command(cli_display)
 cli_knipse.add_command(cli_show_image)
 cli_knipse.add_command(cli_list)
 cli_knipse.add_command(cli_kivy)
+cli_knipse.add_command(cli_update_thumbnails)
 
 
 if __name__ == "__main__":

@@ -252,7 +252,7 @@ class KnipseDB:
         assert size in THUMBNAIL_SIZES
         with self.db as conn:
             cursor = conn.execute(_GET_THUMBNAIL, (descriptor.image_id, ))
-            if cursor.rows:
+            if cursor.rowcount > 0:
                 update_data = (descriptor.image_id, thumbnail)
                 conn.execute(_UPDATE_THUMBNAIL.format(size), update_data)
             else:
