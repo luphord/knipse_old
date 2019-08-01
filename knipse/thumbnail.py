@@ -12,8 +12,8 @@ from .db import KnipseDB
 
 def update_thumbnails(db: KnipseDB, base_folder: Path, descr: ImageDescriptor):
     img_path = base_folder / descr.path
-    img = Image.open(str(img_path))
-    thumb = img.resize((300, 200))
+    thumb = Image.open(str(img_path))
+    thumb.thumbnail((300, 200))
     stream = io.BytesIO()
     thumb.save(stream, format='JPEG')
     db.store_thumbnail(descr, stream.getvalue(), 't300x200')
