@@ -11,6 +11,7 @@ from knipse.descriptor import ImageDescriptor, ListDescriptor, \
 from knipse.image import descriptor_from_image
 from knipse.walk import walk_images
 from knipse.scan import scan_images, purge_images
+from knipse.thumbnail import update_all_thumbnails
 
 from .test_walk import EXPECTED_IMAGES
 
@@ -275,3 +276,19 @@ class TestKnipseDatabase(unittest.TestCase):
         lists.append(self.db.store_list(self.example_list, images))
         loaded_lists = list(self.db.load_all_list_descriptors())
         self.assertEqual(lists, loaded_lists)
+
+    def test_thumbnail_update(self) -> None:
+        '''Test creating thumbnails for all images.'''
+        cnt = 0
+        for file_path, progress in scan_images(self.db, self.src,
+                                               skip_thumbnail_folders=True):
+            cnt += 1
+        self.assertEqual(len(EXPECTED_IMAGES), cnt)
+        update_all_thumbnails(self.db, self.src)
+        with self.db.db as conn:
+            cnt = conn.execute('SELECT count(*) FROM thumbnails;') \
+                      .fetchone()[0]
+            self.assertEqual(len(EXPECTED_IMAGES), cnt)
+            for row in conn.execute('SELECT * FROM thumbnails;'):
+                for field in row:
+                    self.assertIsNotNone(field)
