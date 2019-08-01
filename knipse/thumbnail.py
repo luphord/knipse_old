@@ -1,22 +1,20 @@
 # -*- coding: utf-8 -*-
 
-import io
 from pathlib import Path
 
 import click
 from PIL import Image
 
 from .descriptor import ImageDescriptor
-from .db import KnipseDB
+from .db import KnipseDB, THUMBNAIL_SIZES
 
 
 def update_thumbnails(db: KnipseDB, base_folder: Path, descr: ImageDescriptor):
     img_path = base_folder / descr.path
-    thumb = Image.open(str(img_path))
-    thumb.thumbnail((300, 200))
-    stream = io.BytesIO()
-    thumb.save(stream, format='JPEG')
-    db.store_thumbnail(descr, stream.getvalue(), 't300x200')
+    for size in THUMBNAIL_SIZES:
+        thumb = Image.open(str(img_path))
+        thumb.thumbnail(size)
+        db.store_thumbnail(descr, thumb, size)
 
 
 def update_all_thumbnails(db: KnipseDB, base_folder: Path):

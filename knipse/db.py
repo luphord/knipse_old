@@ -4,7 +4,10 @@ import sqlite3
 from datetime import datetime
 from pathlib import Path
 from collections import Counter
+import io
 from typing import Optional, Iterable, Tuple
+
+from PIL import Image
 
 from .descriptor import ImageDescriptor, ListDescriptor, \
                         ListEntryDescriptor
@@ -38,7 +41,7 @@ _CREATE_LIST_ENTRIES_TABLE = \
     );
     '''
 
-THUMBNAIL_SIZES = ('t120x80', 't300x200')
+THUMBNAIL_SIZES = ((120, 80), (300, 200))
 
 _CREATE_THUMBNAILS_TABLE = \
     '''CREATE TABLE IF NOT EXISTS thumbnails (
@@ -247,17 +250,23 @@ class KnipseDB:
         yield thumbnail if size == 't120x80' else None
         yield thumbnail if size == 't300x200' else None
 
-    def store_thumbnail(self, descriptor: ImageDescriptor,
-                        thumbnail: bytes, size: str):
+    def store_thumbnail(self, descriptor: ImageDescriptor, thumbnail: Image,
+                        size: Tuple[int, int]):
         assert size in THUMBNAIL_SIZES
+        assert thumbnail.size[0] <= size[0] and thumbnail.size[1] <= size[1]
+        size_col = 't{}x{}'.format(*size)
+        with io.BytesIO() as stream:
+            thumbnail.save(stream, format='JPEG')
+            thumbnail_data = stream.getvalue()
         with self.db as conn:
             cursor = conn.execute(_GET_THUMBNAIL, (descriptor.image_id, ))
             if cursor.rowcount > 0:
-                update_data = (descriptor.image_id, thumbnail)
-                conn.execute(_UPDATE_THUMBNAIL.format(size), update_data)
+                update_data = (descriptor.image_id, thumbnail_data)
+                conn.execute(_UPDATE_THUMBNAIL.format(size_col), update_data)
             else:
-                data = tuple(KnipseDB._thumbnail_data(descriptor, thumbnail,
-                                                      size))
+                data = tuple(KnipseDB._thumbnail_data(descriptor,
+                                                      thumbnail_data,
+                                                      size_col))
                 conn.execute(_INSERT_THUMBNAIL, data)
 
     def descriptor_from_row(self, row: tuple) -> ImageDescriptor:
