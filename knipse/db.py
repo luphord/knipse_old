@@ -262,7 +262,7 @@ class KnipseDB:
         with self.db as conn:
             cursor = conn.execute(_GET_THUMBNAIL, (descriptor.image_id, ))
             if cursor.fetchone():
-                update_data = (descriptor.image_id, thumbnail_data)
+                update_data = (thumbnail_data, descriptor.image_id)
                 conn.execute(_UPDATE_THUMBNAIL.format(size_col), update_data)
             else:
                 data = tuple(KnipseDB._thumbnail_data(descriptor,
