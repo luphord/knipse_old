@@ -48,6 +48,7 @@ _CREATE_THUMBNAILS_TABLE = \
         image_id int,
         t120x80 blob,
         t300x200 blob,
+        UNIQUE (image_id),
         FOREIGN KEY (image_id) REFERENCES images
     );
     '''
