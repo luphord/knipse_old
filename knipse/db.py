@@ -109,7 +109,7 @@ _UPDATE_LIST_ENTRY = \
 _UPDATE_THUMBNAIL = \
     '''UPDATE thumbnails
        SET
-         {} = ?,
+         {} = ?
        WHERE image_id = ?;
     '''
 
@@ -261,7 +261,7 @@ class KnipseDB:
             thumbnail_data = stream.getvalue()
         with self.db as conn:
             cursor = conn.execute(_GET_THUMBNAIL, (descriptor.image_id, ))
-            if cursor.rowcount > 0:
+            if cursor.fetchone():
                 update_data = (descriptor.image_id, thumbnail_data)
                 conn.execute(_UPDATE_THUMBNAIL.format(size_col), update_data)
             else:
