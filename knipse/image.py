@@ -69,3 +69,21 @@ def descriptor_from_image(source: Path,
                            md5,
                            dhsh,
                            True)
+
+
+def open_image_and_rotate(path: Path):
+    '''Open image and rotate according to exif (if available).'''
+    img = Image.open(str(path))
+    if hasattr(img, '_getexif'):
+        orientation = 0x0112
+        exif = img._getexif()
+        if exif is not None:
+            orientation = exif[orientation]
+            rotations = {
+                3: Image.ROTATE_180,
+                6: Image.ROTATE_270,
+                8: Image.ROTATE_90
+            }
+            if orientation in rotations:
+                img = img.transpose(rotations[orientation])
+    return img

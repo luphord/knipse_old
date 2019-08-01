@@ -3,8 +3,8 @@
 from pathlib import Path
 
 import click
-from PIL import Image
 
+from .image import open_image_and_rotate
 from .descriptor import ImageDescriptor
 from .db import KnipseDB, THUMBNAIL_SIZES
 
@@ -12,7 +12,7 @@ from .db import KnipseDB, THUMBNAIL_SIZES
 def update_thumbnails(db: KnipseDB, base_folder: Path, descr: ImageDescriptor):
     img_path = base_folder / descr.path
     for size in THUMBNAIL_SIZES:
-        thumb = Image.open(str(img_path))
+        thumb = open_image_and_rotate(img_path)
         thumb.thumbnail(size)
         db.store_thumbnail(descr, thumb, size)
 
