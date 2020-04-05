@@ -1,3 +1,15 @@
+DEPRECATED
+==========
+
+I have decided to deprecate this repository and the corresponding approach to photo management.
+Instead, I have created a new knipse_ repository and CLI application that works as a complement to pix_ / gThumb_.
+I am leaving the code available for public inspection hoping that someone might find it useful.
+
+.. _knipse: https://github.com/luphord/knipse
+.. _pix: https://github.com/linuxmint/pix
+.. _gThumb: https://wiki.gnome.org/Apps/Gthumb
+
+
 ====================
 Knipse Photo Manager
 ====================
