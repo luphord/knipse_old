@@ -14,20 +14,6 @@ I am leaving the code available for public inspection hoping that someone might 
 Knipse Photo Manager
 ====================
 
-
-.. image:: https://img.shields.io/pypi/v/knipse.svg
-        :target: https://pypi.python.org/pypi/knipse
-
-.. image:: https://img.shields.io/travis/luphord/knipse.svg
-        :target: https://travis-ci.org/luphord/knipse
-
-.. image:: https://readthedocs.org/projects/knipse/badge/?version=latest
-        :target: https://knipse.readthedocs.io/en/latest/?badge=latest
-        :alt: Documentation Status
-
-
-
-
 A photo manager focussing on list management.
 
 
